@@ -447,6 +447,84 @@ function InputField({ label, value, onChange, placeholder, type = "text", error 
   );
 }
 
+function CountryBadge({ country, size = 44 }) {
+  const r = size * 0.32;
+  const s = country.stripes;
+  let flagContent;
+
+  if (country.diagonal) {
+    // Tanzania-style diagonal bands
+    flagContent = (
+      <>
+        <rect width={size} height={size} fill={s[0]} />
+        <polygon points={`${size},0 ${size},${size} 0,${size}`} fill={s[2]} />
+        <polygon points={`0,${size * 0.3} ${size},0 ${size},${size * 0.45} 0,${size * 0.7}`} fill="#000" />
+        <polygon points={`0,${size * 0.35} ${size},${size * 0.05} ${size},${size * 0.38} 0,${size * 0.65}`} fill={s[1]} />
+      </>
+    );
+  } else if (country.vertical) {
+    // Nigeria-style vertical stripes
+    const w = size / 3;
+    flagContent = (
+      <>
+        <rect x={0} width={w} height={size} fill={s[0]} />
+        <rect x={w} width={w} height={size} fill={s[1]} />
+        <rect x={w * 2} width={w} height={size} fill={s[2]} />
+      </>
+    );
+  } else if (country.shield) {
+    // Kenya-style horizontal stripes with center shield
+    const h = size / 3;
+    flagContent = (
+      <>
+        <rect y={0} width={size} height={h} fill={s[0]} />
+        <rect y={h - 1} width={size} height={2} fill="#FFF" />
+        <rect y={h} width={size} height={h} fill={s[1]} />
+        <rect y={h * 2 - 1} width={size} height={2} fill="#FFF" />
+        <rect y={h * 2} width={size} height={h} fill={s[2]} />
+        {/* Simplified Maasai shield */}
+        <ellipse cx={size / 2} cy={size / 2} rx={size * 0.13} ry={size * 0.22} fill="#BB0000" stroke="#000" strokeWidth="1" />
+        <line x1={size / 2} y1={size * 0.28} x2={size / 2} y2={size * 0.72} stroke="#FFF" strokeWidth="1" />
+      </>
+    );
+  } else {
+    // Uganda-style horizontal stripes with center disc
+    const h = size / 6;
+    flagContent = (
+      <>
+        {[s[0], s[1], s[2], s[0], s[1], s[2]].map((color, i) => (
+          <rect key={i} y={h * i} width={size} height={h + 0.5} fill={color} />
+        ))}
+        {country.center && <circle cx={size / 2} cy={size / 2} r={size * 0.15} fill="#FFF" />}
+        {country.center && <circle cx={size / 2} cy={size / 2} r={size * 0.12} fill={country.center} />}
+      </>
+    );
+  }
+
+  return (
+    <div style={{ width: size, height: size, borderRadius: r, overflow: "hidden", position: "relative", flexShrink: 0 }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: "block" }}>
+        {flagContent}
+      </svg>
+      {/* Glass overlay with country code */}
+      <div style={{
+        position: "absolute", inset: 0, borderRadius: r,
+        background: "rgba(240, 235, 225, 0.35)",
+        backdropFilter: "blur(1px)", WebkitBackdropFilter: "blur(1px)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        border: "1px solid rgba(255,255,255,0.3)",
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3)",
+      }}>
+        <span style={{
+          fontSize: size * 0.32, fontWeight: 800, color: "#2C2C2A",
+          fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "0.04em",
+          textShadow: "0 1px 2px rgba(255,255,255,0.5)",
+        }}>{country.code}</span>
+      </div>
+    </div>
+  );
+}
+
 export default function Amelior8App() {
   const [screen, setScreen] = useState(screens.HOME);
   const [selectedCause, setSelectedCause] = useState(null);
@@ -471,10 +549,10 @@ export default function Amelior8App() {
   ];
 
   const countries = [
-    { code: "KE", name: "Kenya", projects: 12 },
-    { code: "UG", name: "Uganda", projects: 8 },
-    { code: "NG", name: "Nigeria", projects: 15 },
-    { code: "TZ", name: "Tanzania", projects: 6 },
+    { code: "KE", name: "Kenya", projects: 12, stripes: ["#000000", "#BB0000", "#006600"], shield: true },
+    { code: "UG", name: "Uganda", projects: 8, stripes: ["#000000", "#FCDC04", "#D90000"], center: "#9CA69C" },
+    { code: "NG", name: "Nigeria", projects: 15, stripes: ["#008751", "#FFFFFF", "#008751"], vertical: true },
+    { code: "TZ", name: "Tanzania", projects: 6, stripes: ["#00A3DD", "#FCD116", "#1EB53A"], diagonal: true },
   ];
 
   const partners = {
@@ -806,12 +884,9 @@ export default function Amelior8App() {
                 <div key={i} onClick={() => { setSelectedCountry(c); navigate(screens.PARTNER); }} style={{
                   ...glass.panel, padding: "18px 14px", textAlign: "center", cursor: "pointer", transition: "all 0.2s ease",
                 }}>
-                  <div style={{
-                    width: "44px", height: "44px", borderRadius: "14px",
-                    background: "rgba(240, 235, 225, 0.6)", border: `1px solid rgba(107, 107, 82, 0.12)`,
-                    display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 10px",
-                    fontSize: "15px", fontWeight: 700, color: colors.text, fontFamily: fonts.ui, letterSpacing: "0.04em",
-                  }}>{c.code}</div>
+                  <div style={{ margin: "0 auto 10px" }}>
+                    <CountryBadge country={c} size={44} />
+                  </div>
                   <p style={{ fontSize: "14px", fontWeight: 700, color: colors.text, margin: "0 0 2px", fontFamily: fonts.ui }}>{c.name}</p>
                   <p style={{ fontSize: "11px", color: colors.textTertiary, margin: 0, fontFamily: fonts.body }}>{c.projects} active projects</p>
                 </div>
