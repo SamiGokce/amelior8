@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 const screens = {
   HOME: "home",
@@ -168,12 +168,12 @@ function QRCode({ data, size = 160 }) {
       if (matrix[r][c])
         rects.push(
           <rect key={`${r}-${c}`} x={offset + c * cellSize} y={offset + r * cellSize}
-            width={cellSize + 0.5} height={cellSize + 0.5} fill="#1a1a2e" rx="0.5" />
+            width={cellSize + 0.5} height={cellSize + 0.5} fill="#2C2C2A" rx="0.5" />
         );
 
   return (
     <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size} style={{ display: "block", margin: "0 auto" }}>
-      <rect width={size} height={size} fill="rgba(255,255,255,0.85)" rx="8" />
+      <rect width={size} height={size} fill="#F0EBE1" rx="8" />
       {rects}
     </svg>
   );
@@ -192,7 +192,7 @@ function generateDonorId() {
 }
 
 // ============================================================
-//  ICONS — minimal inline SVGs
+//  ICONS
 // ============================================================
 const Icon = {
   droplet: (s = 20, c = "currentColor") => (
@@ -311,58 +311,66 @@ const Icon = {
 };
 
 // ============================================================
-//  DESIGN TOKENS
+//  DESIGN TOKENS — Brand palette from BRAND.md
 // ============================================================
 const glass = {
   panel: {
-    background: "rgba(255, 255, 255, 0.45)",
+    background: "rgba(240, 235, 225, 0.5)",
     backdropFilter: "blur(24px) saturate(180%)",
     WebkitBackdropFilter: "blur(24px) saturate(180%)",
-    border: "1px solid rgba(255, 255, 255, 0.55)",
+    border: "1px solid rgba(240, 235, 225, 0.7)",
     borderRadius: "20px",
-    boxShadow: "0 4px 24px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.7)",
+    boxShadow: "0 4px 24px rgba(44, 44, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.5)",
   },
   panelLight: {
-    background: "rgba(255, 255, 255, 0.3)",
+    background: "rgba(240, 235, 225, 0.35)",
     backdropFilter: "blur(16px) saturate(150%)",
     WebkitBackdropFilter: "blur(16px) saturate(150%)",
-    border: "1px solid rgba(255, 255, 255, 0.4)",
+    border: "1px solid rgba(240, 235, 225, 0.5)",
     borderRadius: "16px",
-    boxShadow: "0 2px 12px rgba(0, 0, 0, 0.03)",
+    boxShadow: "0 2px 12px rgba(44, 44, 42, 0.03)",
   },
   panelAccent: {
-    background: "rgba(224, 107, 60, 0.08)",
+    background: "rgba(204, 86, 2, 0.07)",
     backdropFilter: "blur(16px) saturate(150%)",
     WebkitBackdropFilter: "blur(16px) saturate(150%)",
-    border: "1px solid rgba(224, 107, 60, 0.15)",
+    border: "1px solid rgba(204, 86, 2, 0.12)",
     borderRadius: "16px",
   },
   panelSuccess: {
-    background: "rgba(52, 199, 89, 0.08)",
+    background: "rgba(122, 154, 148, 0.1)",
     backdropFilter: "blur(16px) saturate(150%)",
     WebkitBackdropFilter: "blur(16px) saturate(150%)",
-    border: "1px solid rgba(52, 199, 89, 0.15)",
+    border: "1px solid rgba(122, 154, 148, 0.2)",
     borderRadius: "16px",
   },
 };
 
 const colors = {
-  accent: "#d4603a",
-  accentLight: "rgba(212, 96, 58, 0.12)",
-  accentGlow: "rgba(212, 96, 58, 0.25)",
-  text: "#1a1a2e",
-  textSecondary: "rgba(0, 0, 0, 0.48)",
-  textTertiary: "rgba(0, 0, 0, 0.3)",
-  success: "#34c759",
-  successText: "#1b5e30",
-  white60: "rgba(255,255,255,0.6)",
-  white40: "rgba(255,255,255,0.4)",
-  divider: "rgba(0,0,0,0.06)",
+  // Brand palette
+  burntOrange: "#CC5602",
+  cloudDancer: "#F0EBE1",
+  charcoal: "#2C2C2A",
+  oliveDrab: "#6B6B52",
+  dustyTeal: "#7A9A94",
+  // Semantic aliases
+  accent: "#CC5602",
+  accentLight: "rgba(204, 86, 2, 0.1)",
+  accentGlow: "rgba(204, 86, 2, 0.25)",
+  text: "#2C2C2A",
+  textSecondary: "#6B6B52",
+  textTertiary: "#7A9A94",
+  success: "#5A8A64",
+  successText: "#3D6B47",
+  divider: "rgba(107, 107, 82, 0.12)",
 };
 
 const fonts = {
-  system: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Segoe UI', sans-serif",
+  display: "'Bricolage Grotesque', 'Georgia', serif",
+  ui: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
+  body: "'Georgia', 'Times New Roman', serif",
   mono: "'SF Mono', 'Fira Code', 'Courier New', monospace",
+  caption: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
 };
 
 // ============================================================
@@ -372,9 +380,10 @@ function InputField({ label, value, onChange, placeholder, type = "text", error 
   return (
     <div style={{ marginBottom: "12px" }}>
       <label style={{
-        display: "block", fontSize: "11px", fontWeight: 600,
+        display: "block", fontSize: "12px", fontWeight: 600,
         color: colors.textSecondary, marginBottom: "5px",
-        letterSpacing: "0.02em", fontFamily: fonts.system,
+        letterSpacing: "0.04em", fontFamily: fonts.caption,
+        textTransform: "uppercase",
       }}>{label}</label>
       <input
         type={type}
@@ -383,26 +392,26 @@ function InputField({ label, value, onChange, placeholder, type = "text", error 
         placeholder={placeholder}
         style={{
           width: "100%", padding: "12px 14px", borderRadius: "14px",
-          border: error ? "1.5px solid #ef4444" : "1px solid rgba(255,255,255,0.5)",
-          fontSize: "14px", fontFamily: fonts.system,
-          background: "rgba(255, 255, 255, 0.45)",
+          border: error ? "1.5px solid #c44" : `1px solid rgba(107, 107, 82, 0.2)`,
+          fontSize: "14px", fontFamily: fonts.body,
+          background: "rgba(240, 235, 225, 0.5)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
           color: colors.text, outline: "none",
           boxSizing: "border-box",
           transition: "all 0.2s ease",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.6)",
+          boxShadow: "0 2px 8px rgba(44,44,42,0.03), inset 0 1px 0 rgba(255,255,255,0.4)",
         }}
         onFocus={(e) => {
           e.target.style.borderColor = colors.accent;
-          e.target.style.boxShadow = `0 0 0 3px ${colors.accentGlow}, 0 2px 8px rgba(0,0,0,0.03)`;
+          e.target.style.boxShadow = `0 0 0 3px ${colors.accentGlow}, 0 2px 8px rgba(44,44,42,0.03)`;
         }}
         onBlur={(e) => {
-          e.target.style.borderColor = error ? "#ef4444" : "rgba(255,255,255,0.5)";
-          e.target.style.boxShadow = "0 2px 8px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.6)";
+          e.target.style.borderColor = error ? "#c44" : "rgba(107, 107, 82, 0.2)";
+          e.target.style.boxShadow = "0 2px 8px rgba(44,44,42,0.03), inset 0 1px 0 rgba(255,255,255,0.4)";
         }}
       />
-      {error && <p style={{ fontSize: "11px", color: "#ef4444", margin: "4px 0 0", fontWeight: 600, fontFamily: fonts.system }}>{error}</p>}
+      {error && <p style={{ fontSize: "11px", color: "#c44", margin: "4px 0 0", fontWeight: 600, fontFamily: fonts.ui }}>{error}</p>}
     </div>
   );
 }
@@ -424,10 +433,10 @@ export default function Amelior8App() {
   const [errors, setErrors] = useState({});
 
   const causes = [
-    { icon: "droplet", label: "Water", color: "#3b82f6" },
-    { icon: "book", label: "Education", color: "#8b5cf6" },
-    { icon: "heart", label: "Health", color: "#ef4444" },
-    { icon: "wheat", label: "Food", color: "#f59e0b" },
+    { icon: "droplet", label: "Water", color: "#7A9A94" },
+    { icon: "book", label: "Education", color: "#6B6B52" },
+    { icon: "heart", label: "Health", color: "#CC5602" },
+    { icon: "wheat", label: "Food", color: "#8B7355" },
   ];
 
   const countries = [
@@ -488,103 +497,57 @@ export default function Amelior8App() {
     setScreen(screens.HOME);
   };
 
-  // ============================================================
-  //  DONATION PROCESSING
-  // ============================================================
   async function processDonation() {
     const newDonorId = generateDonorId();
     setDonorId(newDonorId);
-
     setProcessingStep(1);
     await new Promise((r) => setTimeout(r, 800));
-
     const donorDoc = {
-      name: donorInfo.name,
-      email: donorInfo.email,
-      phone: donorInfo.phone || null,
-      item: selectedCause?.label || "Gift",
-      cause: selectedCause?.label,
-      country: selectedCountry?.name,
-      partner: selectedPartner?.name,
-      partnerLocation: selectedPartner?.location,
-      amount: selectedAmount,
-      currency: "USD",
-      donatedAt: new Date().toISOString(),
-      status: "pending_delivery",
-      videoURL: null,
-      videoSentAt: null,
+      name: donorInfo.name, email: donorInfo.email, phone: donorInfo.phone || null,
+      item: selectedCause?.label || "Gift", cause: selectedCause?.label,
+      country: selectedCountry?.name, partner: selectedPartner?.name,
+      partnerLocation: selectedPartner?.location, amount: selectedAmount,
+      currency: "USD", donatedAt: new Date().toISOString(),
+      status: "pending_delivery", videoURL: null, videoSentAt: null,
     };
-
     if (initFirebase() && db) {
-      try {
-        await db.collection("donors").doc(newDonorId).set(donorDoc);
-        console.log("Donor saved to Firestore:", newDonorId);
-      } catch (err) {
-        console.error("Firestore write error:", err);
-      }
-    } else {
-      console.log("Firebase not configured — donor record (local only):", newDonorId, donorDoc);
+      try { await db.collection("donors").doc(newDonorId).set(donorDoc); }
+      catch (err) { console.error("Firestore write error:", err); }
     }
-
     setProcessingStep(2);
     await new Promise((r) => setTimeout(r, 600));
-
     setProcessingStep(3);
     await new Promise((r) => setTimeout(r, 600));
-
     setProcessingDone(true);
     await new Promise((r) => setTimeout(r, 600));
     navigate(screens.QR_READY);
   }
 
-  useEffect(() => {
-    if (screen === screens.PROCESSING) {
-      processDonation();
-    }
-  }, [screen]);
-
+  useEffect(() => { if (screen === screens.PROCESSING) processDonation(); }, [screen]);
   useEffect(() => {
     if (isPlaying && videoProgress < 100) {
       const t = setInterval(() => {
-        setVideoProgress((p) => {
-          if (p >= 100) {
-            setIsPlaying(false);
-            return 100;
-          }
-          return p + 2;
-        });
+        setVideoProgress((p) => { if (p >= 100) { setIsPlaying(false); return 100; } return p + 2; });
       }, 100);
       return () => clearInterval(t);
     }
   }, [isPlaying, videoProgress]);
-
   useEffect(() => {
     if (screen === screens.TRACKING) {
       const t = setTimeout(() => setShowNotification(true), 1500);
       return () => clearTimeout(t);
-    } else {
-      setShowNotification(false);
-    }
+    } else { setShowNotification(false); }
   }, [screen]);
 
-  // ============================================================
-  //  VALIDATION
-  // ============================================================
   function validateDonorInfo() {
     const errs = {};
     if (!donorInfo.name.trim()) errs.name = "Name is required";
-    if (!donorInfo.email.trim()) {
-      errs.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(donorInfo.email)) {
-      errs.email = "Enter a valid email";
-    }
+    if (!donorInfo.email.trim()) errs.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(donorInfo.email)) errs.email = "Enter a valid email";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }
 
-  // ============================================================
-  //  HELPER — render cause icon
-  // ============================================================
   const renderIcon = (iconName, size = 20, color = "currentColor") => {
     const fn = Icon[iconName];
     return fn ? fn(size, color) : null;
@@ -601,17 +564,15 @@ export default function Amelior8App() {
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         {showBack && history.length > 0 && (
           <div onClick={goBack} style={{
-            cursor: "pointer", color: colors.accent, lineHeight: 1,
-            width: "28px", height: "28px", borderRadius: "10px",
+            cursor: "pointer", width: "28px", height: "28px", borderRadius: "10px",
             display: "flex", alignItems: "center", justifyContent: "center",
-            background: colors.accentLight,
-            transition: "all 0.2s ease",
+            background: colors.accentLight, transition: "all 0.2s ease",
           }}>{Icon.arrowLeft(16, colors.accent)}</div>
         )}
-        <span style={{ fontSize: "15px", fontWeight: 700, color: colors.text, fontFamily: fonts.system, letterSpacing: "-0.01em" }}>{title}</span>
+        <span style={{ fontSize: "15px", fontWeight: 700, color: colors.text, fontFamily: fonts.ui, letterSpacing: "-0.01em" }}>{title}</span>
       </div>
       {rightAction || (
-        <span style={{ fontSize: "10px", color: colors.accent, fontWeight: 700, letterSpacing: "0.12em", fontFamily: fonts.system }}>AMELIOR8</span>
+        <span style={{ fontSize: "10px", color: colors.accent, fontWeight: 700, letterSpacing: "-0.05em", fontFamily: fonts.display }}>Amelior8</span>
       )}
     </div>
   );
@@ -620,19 +581,17 @@ export default function Amelior8App() {
     <div onClick={disabled ? undefined : onClick} style={{
       padding: "14px", borderRadius: "16px", textAlign: "center",
       fontWeight: 700, fontSize: "14px", cursor: disabled ? "default" : "pointer",
-      fontFamily: fonts.system, letterSpacing: "-0.01em",
-      background: primary
-        ? `linear-gradient(135deg, ${colors.accent}, #b84a28)`
-        : "rgba(255, 255, 255, 0.45)",
+      fontFamily: fonts.ui, letterSpacing: "-0.01em",
+      background: primary ? colors.accent : "rgba(240, 235, 225, 0.55)",
       backdropFilter: primary ? "none" : "blur(20px)",
       WebkitBackdropFilter: primary ? "none" : "blur(20px)",
-      color: primary ? "white" : colors.text,
-      border: primary ? "none" : "1px solid rgba(255,255,255,0.5)",
+      color: primary ? colors.cloudDancer : colors.text,
+      border: primary ? "none" : `1px solid rgba(107, 107, 82, 0.15)`,
       transition: "all 0.25s ease",
       opacity: disabled ? 0.4 : 1,
       boxShadow: primary
-        ? `0 4px 20px ${colors.accentGlow}, inset 0 1px 0 rgba(255,255,255,0.2)`
-        : "0 2px 12px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.6)",
+        ? `0 4px 20px ${colors.accentGlow}, inset 0 1px 0 rgba(255,255,255,0.15)`
+        : "0 2px 12px rgba(44,44,42,0.04), inset 0 1px 0 rgba(255,255,255,0.4)",
       ...s
     }}>{children}</div>
   );
@@ -643,7 +602,6 @@ export default function Amelior8App() {
   const renderScreen = () => {
     switch (screen) {
 
-      // ==================== HOME ====================
       case screens.HOME:
         return (
           <div style={{ display: "flex", flexDirection: "column", height: "100%", justifyContent: "space-between" }}>
@@ -651,26 +609,24 @@ export default function Amelior8App() {
               <div style={{ textAlign: "center", padding: "24px 0 20px" }}>
                 <div style={{
                   width: "60px", height: "60px", borderRadius: "18px",
-                  background: `linear-gradient(135deg, ${colors.accent}, #e8845c)`,
-                  margin: "0 auto 14px",
+                  background: colors.accent, margin: "0 auto 14px",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   boxShadow: `0 8px 28px ${colors.accentGlow}`,
                 }}>
-                  {Icon.globe(28, "rgba(255,255,255,0.95)")}
+                  {Icon.globe(28, colors.cloudDancer)}
                 </div>
                 <h1 style={{
-                  fontFamily: fonts.system, fontSize: "28px", fontWeight: 800,
-                  color: colors.text, margin: "0 0 4px", letterSpacing: "-0.03em",
-                }}>amelior8</h1>
-                <p style={{ fontSize: "13px", color: colors.textSecondary, fontStyle: "italic", margin: 0, fontFamily: fonts.system }}>Making giving visible.</p>
+                  fontFamily: fonts.display, fontSize: "28px", fontWeight: 700,
+                  color: colors.accent, margin: "0 0 4px", letterSpacing: "-0.05em",
+                }}>Amelior8</h1>
+                <p style={{ fontSize: "14px", color: colors.textSecondary, fontStyle: "italic", margin: 0, fontFamily: fonts.body }}>Making giving visible.</p>
               </div>
 
               <div style={{
-                ...glass.panelAccent,
-                padding: "14px 16px", margin: "0 0 14px",
+                ...glass.panelAccent, padding: "14px 16px", margin: "0 0 14px",
               }}>
-                <p style={{ fontSize: "13px", fontWeight: 600, color: colors.accent, margin: "0 0 4px", fontFamily: fonts.system }}>Direct. Transparent. Verified.</p>
-                <p style={{ fontSize: "12px", color: colors.textSecondary, margin: 0, lineHeight: 1.5, fontFamily: fonts.system }}>
+                <p style={{ fontSize: "13px", fontWeight: 700, color: colors.accent, margin: "0 0 4px", fontFamily: fonts.ui }}>Direct. Transparent. Verified.</p>
+                <p style={{ fontSize: "13px", color: colors.textSecondary, margin: 0, lineHeight: 1.5, fontFamily: fonts.body }}>
                   Donate directly to local NGOs. Receive AI-verified video proof of your impact. No intermediaries.
                 </p>
               </div>
@@ -681,289 +637,218 @@ export default function Amelior8App() {
                   { n: "100%", l: "Transparent" },
                   { n: "AI", l: "Verified" },
                 ].map((s, i) => (
-                  <div key={i} style={{
-                    flex: 1, textAlign: "center",
-                    ...glass.panelLight,
-                    padding: "12px 6px",
-                  }}>
-                    <p style={{ fontSize: "18px", fontWeight: 800, color: colors.text, margin: "0 0 2px", fontFamily: fonts.system }}>{s.n}</p>
-                    <p style={{ fontSize: "10px", color: colors.textTertiary, margin: 0, fontFamily: fonts.system }}>{s.l}</p>
+                  <div key={i} style={{ flex: 1, textAlign: "center", ...glass.panelLight, padding: "12px 6px" }}>
+                    <p style={{ fontSize: "18px", fontWeight: 700, color: colors.text, margin: "0 0 2px", fontFamily: fonts.display, letterSpacing: "-0.03em" }}>{s.n}</p>
+                    <p style={{ fontSize: "10px", color: colors.textTertiary, margin: 0, fontFamily: fonts.caption, textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.l}</p>
                   </div>
                 ))}
               </div>
             </div>
-
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               <Btn onClick={() => navigate(screens.CAUSE)}>Start Giving</Btn>
-              <Btn primary={false} onClick={() => { navigate(screens.TRACKING); }}>View My Donations</Btn>
+              <Btn primary={false} onClick={() => navigate(screens.TRACKING)}>View My Donations</Btn>
             </div>
           </div>
         );
 
-      // ==================== CAUSE ====================
       case screens.CAUSE:
         return (
           <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
             <Header title="Choose a Cause" />
-            <p style={{ fontSize: "13px", color: colors.textSecondary, margin: "0 0 14px", lineHeight: 1.5, fontFamily: fonts.system }}>What problem do you care about? Pick a cause to support directly.</p>
+            <p style={{ fontSize: "14px", color: colors.textSecondary, margin: "0 0 14px", lineHeight: 1.5, fontFamily: fonts.body }}>What problem do you care about? Pick a cause to support directly.</p>
             <div style={{ display: "flex", flexDirection: "column", gap: "10px", flex: 1 }}>
               {causes.map((c, i) => (
                 <div key={i} onClick={() => { setSelectedCause(c); navigate(screens.COUNTRY); }} style={{
                   display: "flex", alignItems: "center", gap: "14px",
-                  ...glass.panel,
-                  padding: "14px 16px",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
+                  ...glass.panel, padding: "14px 16px", cursor: "pointer", transition: "all 0.2s ease",
                 }}>
                   <div style={{
                     width: "44px", height: "44px", borderRadius: "14px",
-                    background: `${c.color}12`,
-                    border: `1px solid ${c.color}20`,
-                    display: "flex", alignItems: "center",
-                    justifyContent: "center", flexShrink: 0
+                    background: `${c.color}15`, border: `1px solid ${c.color}25`,
+                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0
                   }}>{renderIcon(c.icon, 22, c.color)}</div>
                   <div style={{ flex: 1 }}>
-                    <p style={{ fontSize: "15px", fontWeight: 700, color: colors.text, margin: "0 0 2px", fontFamily: fonts.system }}>{c.label}</p>
-                    <p style={{ fontSize: "11px", color: colors.textTertiary, margin: 0, fontFamily: fonts.system }}>Support {c.label.toLowerCase()} projects worldwide</p>
+                    <p style={{ fontSize: "15px", fontWeight: 700, color: colors.text, margin: "0 0 2px", fontFamily: fonts.ui }}>{c.label}</p>
+                    <p style={{ fontSize: "12px", color: colors.textTertiary, margin: 0, fontFamily: fonts.body }}>Support {c.label.toLowerCase()} projects worldwide</p>
                   </div>
-                  <span style={{ color: colors.textTertiary }}>{Icon.chevronRight(16, colors.textTertiary)}</span>
+                  {Icon.chevronRight(16, colors.textTertiary)}
                 </div>
               ))}
             </div>
           </div>
         );
 
-      // ==================== COUNTRY ====================
       case screens.COUNTRY:
         return (
           <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
             <Header title="Pick a Region" />
-            <p style={{ fontSize: "13px", color: colors.textSecondary, margin: "0 0 14px", fontFamily: fonts.system }}>Where do you want your donation to go?</p>
+            <p style={{ fontSize: "14px", color: colors.textSecondary, margin: "0 0 14px", fontFamily: fonts.body }}>Where do you want your donation to go?</p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", flex: 1, alignContent: "start" }}>
               {countries.map((c, i) => (
                 <div key={i} onClick={() => { setSelectedCountry(c); navigate(screens.PARTNER); }} style={{
-                  ...glass.panel,
-                  padding: "18px 14px",
-                  textAlign: "center", cursor: "pointer",
-                  transition: "all 0.2s ease",
+                  ...glass.panel, padding: "18px 14px", textAlign: "center", cursor: "pointer", transition: "all 0.2s ease",
                 }}>
                   <div style={{
                     width: "44px", height: "44px", borderRadius: "14px",
-                    background: "rgba(255,255,255,0.5)",
-                    border: "1px solid rgba(255,255,255,0.6)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    margin: "0 auto 10px",
-                    fontSize: "16px", fontWeight: 800, color: colors.text,
-                    fontFamily: fonts.system, letterSpacing: "0.04em",
+                    background: "rgba(240, 235, 225, 0.6)", border: `1px solid rgba(107, 107, 82, 0.12)`,
+                    display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 10px",
+                    fontSize: "15px", fontWeight: 700, color: colors.text, fontFamily: fonts.ui, letterSpacing: "0.04em",
                   }}>{c.code}</div>
-                  <p style={{ fontSize: "14px", fontWeight: 700, color: colors.text, margin: "0 0 2px", fontFamily: fonts.system }}>{c.name}</p>
-                  <p style={{ fontSize: "11px", color: colors.textTertiary, margin: 0, fontFamily: fonts.system }}>{c.projects} active projects</p>
+                  <p style={{ fontSize: "14px", fontWeight: 700, color: colors.text, margin: "0 0 2px", fontFamily: fonts.ui }}>{c.name}</p>
+                  <p style={{ fontSize: "11px", color: colors.textTertiary, margin: 0, fontFamily: fonts.body }}>{c.projects} active projects</p>
                 </div>
               ))}
             </div>
           </div>
         );
 
-      // ==================== PARTNER ====================
       case screens.PARTNER: {
         const causePartners = partners[selectedCause?.label] || partners.Water;
         return (
           <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
             <Header title="Local Partners" />
-            <p style={{ fontSize: "13px", color: colors.textSecondary, margin: "0 0 14px", fontFamily: fonts.system }}>
+            <p style={{ fontSize: "14px", color: colors.textSecondary, margin: "0 0 14px", fontFamily: fonts.body }}>
               {selectedCause?.label} partners in {selectedCountry?.name}
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: "10px", flex: 1 }}>
               {causePartners.map((p, i) => (
                 <div key={i} onClick={() => { setSelectedPartner(p); navigate(screens.AMOUNT); }} style={{
-                  ...glass.panel,
-                  padding: "16px",
-                  cursor: "pointer",
+                  ...glass.panel, padding: "16px", cursor: "pointer",
                 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: "10px" }}>
                     <div>
-                      <p style={{ fontSize: "14px", fontWeight: 700, color: colors.text, margin: "0 0 2px", fontFamily: fonts.system }}>{p.name}</p>
-                      <p style={{ fontSize: "11px", color: colors.textTertiary, margin: 0, fontFamily: fonts.system }}>{p.location}, {selectedCountry?.name}</p>
+                      <p style={{ fontSize: "14px", fontWeight: 700, color: colors.text, margin: "0 0 2px", fontFamily: fonts.ui }}>{p.name}</p>
+                      <p style={{ fontSize: "12px", color: colors.textTertiary, margin: 0, fontFamily: fonts.body }}>{p.location}, {selectedCountry?.name}</p>
                     </div>
                     {p.verified && (
                       <div style={{
-                        ...glass.panelSuccess,
-                        borderRadius: "20px", padding: "3px 10px",
+                        ...glass.panelSuccess, borderRadius: "20px", padding: "3px 10px",
                         display: "flex", alignItems: "center", gap: "4px"
                       }}>
                         <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: colors.success }} />
-                        <span style={{ fontSize: "10px", fontWeight: 700, color: colors.successText, fontFamily: fonts.system }}>Verified</span>
+                        <span style={{ fontSize: "10px", fontWeight: 700, color: colors.successText, fontFamily: fonts.caption }}>Verified</span>
                       </div>
                     )}
                   </div>
                   <div style={{
-                    background: "rgba(255,255,255,0.35)", borderRadius: "8px", height: "6px", overflow: "hidden",
-                    boxShadow: "inset 0 1px 2px rgba(0,0,0,0.06)",
+                    background: "rgba(240, 235, 225, 0.5)", borderRadius: "8px", height: "6px", overflow: "hidden",
+                    boxShadow: "inset 0 1px 2px rgba(44,44,42,0.06)",
                   }}>
                     <div style={{
-                      height: "100%", width: p.funded,
-                      background: `linear-gradient(90deg, ${colors.accent}, #e8845c)`,
-                      borderRadius: "8px",
-                      transition: "width 0.5s ease",
+                      height: "100%", width: p.funded, background: colors.accent,
+                      borderRadius: "8px", transition: "width 0.5s ease",
                     }} />
                   </div>
-                  <p style={{ fontSize: "10px", color: colors.textTertiary, margin: "4px 0 0", fontFamily: fonts.system }}>{p.funded} funded this month</p>
+                  <p style={{ fontSize: "10px", color: colors.textTertiary, margin: "4px 0 0", fontFamily: fonts.caption }}>{p.funded} funded this month</p>
                 </div>
               ))}
             </div>
-
             <div style={{
-              ...glass.panelAccent,
-              padding: "12px",
+              ...glass.panelAccent, padding: "12px",
               display: "flex", alignItems: "center", gap: "8px", marginTop: "12px",
             }}>
               {Icon.shield(16, colors.accent)}
-              <p style={{ fontSize: "11px", color: colors.accent, fontWeight: 600, margin: 0, fontFamily: fonts.system }}>No intermediaries — funds go direct</p>
+              <p style={{ fontSize: "11px", color: colors.accent, fontWeight: 600, margin: 0, fontFamily: fonts.ui }}>No intermediaries -- funds go direct</p>
             </div>
           </div>
         );
       }
 
-      // ==================== AMOUNT ====================
       case screens.AMOUNT:
         return (
           <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
             <Header title="Choose Amount" />
-            <div style={{
-              ...glass.panel,
-              padding: "14px", marginBottom: "14px",
-            }}>
+            <div style={{ ...glass.panel, padding: "14px", marginBottom: "14px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <div style={{
                   width: "40px", height: "40px", borderRadius: "12px",
-                  background: `${selectedCause?.color}12`,
-                  border: `1px solid ${selectedCause?.color}20`,
+                  background: `${selectedCause?.color}15`, border: `1px solid ${selectedCause?.color}25`,
                   display: "flex", alignItems: "center", justifyContent: "center",
                 }}>{renderIcon(selectedCause?.icon, 20, selectedCause?.color)}</div>
                 <div>
-                  <p style={{ fontSize: "13px", fontWeight: 700, color: colors.text, margin: "0 0 1px", fontFamily: fonts.system }}>{selectedPartner?.name}</p>
-                  <p style={{ fontSize: "11px", color: colors.textTertiary, margin: 0, fontFamily: fonts.system }}>{selectedPartner?.location}, {selectedCountry?.name}</p>
+                  <p style={{ fontSize: "13px", fontWeight: 700, color: colors.text, margin: "0 0 1px", fontFamily: fonts.ui }}>{selectedPartner?.name}</p>
+                  <p style={{ fontSize: "12px", color: colors.textTertiary, margin: 0, fontFamily: fonts.body }}>{selectedPartner?.location}, {selectedCountry?.name}</p>
                 </div>
               </div>
             </div>
-
-            <p style={{ fontSize: "13px", color: colors.textSecondary, margin: "0 0 12px", fontFamily: fonts.system }}>How much would you like to give?</p>
+            <p style={{ fontSize: "14px", color: colors.textSecondary, margin: "0 0 12px", fontFamily: fonts.body }}>How much would you like to give?</p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "16px" }}>
               {amounts.map((a, i) => (
                 <div key={i} onClick={() => setSelectedAmount(a)} style={{
                   padding: "18px", borderRadius: "16px", textAlign: "center",
                   cursor: "pointer", transition: "all 0.25s ease",
-                  background: selectedAmount === a
-                    ? `linear-gradient(135deg, ${colors.accent}, #b84a28)`
-                    : "rgba(255, 255, 255, 0.45)",
+                  background: selectedAmount === a ? colors.accent : "rgba(240, 235, 225, 0.55)",
                   backdropFilter: selectedAmount === a ? "none" : "blur(20px)",
                   WebkitBackdropFilter: selectedAmount === a ? "none" : "blur(20px)",
-                  color: selectedAmount === a ? "white" : colors.text,
-                  border: selectedAmount === a ? "none" : "1px solid rgba(255,255,255,0.5)",
+                  color: selectedAmount === a ? colors.cloudDancer : colors.text,
+                  border: selectedAmount === a ? "none" : `1px solid rgba(107, 107, 82, 0.12)`,
                   boxShadow: selectedAmount === a
                     ? `0 4px 20px ${colors.accentGlow}`
-                    : "0 2px 12px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.6)",
+                    : "0 2px 12px rgba(44,44,42,0.04), inset 0 1px 0 rgba(255,255,255,0.4)",
                 }}>
-                  <span style={{ fontSize: "22px", fontWeight: 800, fontFamily: fonts.system }}>${a}</span>
+                  <span style={{ fontSize: "22px", fontWeight: 700, fontFamily: fonts.display, letterSpacing: "-0.03em" }}>${a}</span>
                 </div>
               ))}
             </div>
-
-            <div style={{
-              ...glass.panelLight,
-              padding: "12px", marginBottom: "14px",
-            }}>
+            <div style={{ ...glass.panelLight, padding: "12px", marginBottom: "14px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                <span style={{ fontSize: "12px", color: colors.textSecondary, fontFamily: fonts.system }}>To partner</span>
-                <span style={{ fontSize: "12px", fontWeight: 700, color: colors.text, fontFamily: fonts.system }}>{selectedAmount ? `$${(selectedAmount * 0.95).toFixed(2)}` : "--"}</span>
+                <span style={{ fontSize: "13px", color: colors.textSecondary, fontFamily: fonts.body }}>To partner</span>
+                <span style={{ fontSize: "13px", fontWeight: 700, color: colors.text, fontFamily: fonts.ui }}>{selectedAmount ? `$${(selectedAmount * 0.95).toFixed(2)}` : "--"}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                <span style={{ fontSize: "12px", color: colors.textSecondary, fontFamily: fonts.system }}>Platform fee (5%)</span>
-                <span style={{ fontSize: "12px", color: colors.textSecondary, fontFamily: fonts.system }}>{selectedAmount ? `$${(selectedAmount * 0.05).toFixed(2)}` : "--"}</span>
+                <span style={{ fontSize: "13px", color: colors.textSecondary, fontFamily: fonts.body }}>Platform fee (5%)</span>
+                <span style={{ fontSize: "13px", color: colors.textSecondary, fontFamily: fonts.body }}>{selectedAmount ? `$${(selectedAmount * 0.05).toFixed(2)}` : "--"}</span>
               </div>
               <div style={{ height: "1px", background: colors.divider, margin: "6px 0" }} />
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: "13px", fontWeight: 700, color: colors.text, fontFamily: fonts.system }}>Total</span>
-                <span style={{ fontSize: "13px", fontWeight: 800, color: colors.accent, fontFamily: fonts.system }}>{selectedAmount ? `$${selectedAmount}` : "--"}</span>
+                <span style={{ fontSize: "13px", fontWeight: 700, color: colors.text, fontFamily: fonts.ui }}>Total</span>
+                <span style={{ fontSize: "13px", fontWeight: 700, color: colors.accent, fontFamily: fonts.ui }}>{selectedAmount ? `$${selectedAmount}` : "--"}</span>
               </div>
             </div>
-
             <div style={{ marginTop: "auto" }}>
-              <Btn onClick={() => selectedAmount && navigate(screens.DONOR_INFO)} disabled={!selectedAmount}>
-                Continue
-              </Btn>
+              <Btn onClick={() => selectedAmount && navigate(screens.DONOR_INFO)} disabled={!selectedAmount}>Continue</Btn>
             </div>
           </div>
         );
 
-      // ==================== DONOR INFO ====================
       case screens.DONOR_INFO:
         return (
           <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
             <Header title="Your Details" />
-
             <div style={{
-              ...glass.panelAccent,
-              padding: "12px",
-              display: "flex", alignItems: "center", gap: "10px",
-              marginBottom: "16px",
+              ...glass.panelAccent, padding: "12px",
+              display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px",
             }}>
               {Icon.lock(16, colors.accent)}
-              <p style={{ fontSize: "11px", color: colors.accent, fontWeight: 600, margin: 0, lineHeight: 1.4, fontFamily: fonts.system }}>
+              <p style={{ fontSize: "12px", color: colors.accent, fontWeight: 600, margin: 0, lineHeight: 1.4, fontFamily: fonts.body }}>
                 We need your info to send you verified video proof of your donation's impact.
               </p>
             </div>
-
-            <InputField
-              label="Full Name"
-              value={donorInfo.name}
+            <InputField label="Full Name" value={donorInfo.name}
               onChange={(v) => { setDonorInfo({ ...donorInfo, name: v }); setErrors({ ...errors, name: null }); }}
-              placeholder="e.g. Sarah Johnson"
-              error={errors.name}
-            />
-
-            <InputField
-              label="Email Address"
-              type="email"
-              value={donorInfo.email}
+              placeholder="e.g. Sarah Johnson" error={errors.name} />
+            <InputField label="Email Address" type="email" value={donorInfo.email}
               onChange={(v) => { setDonorInfo({ ...donorInfo, email: v }); setErrors({ ...errors, email: null }); }}
-              placeholder="you@example.com"
-              error={errors.email}
-            />
-
-            <InputField
-              label="Phone (optional)"
-              type="tel"
-              value={donorInfo.phone}
+              placeholder="you@example.com" error={errors.email} />
+            <InputField label="Phone (optional)" type="tel" value={donorInfo.phone}
               onChange={(v) => setDonorInfo({ ...donorInfo, phone: v })}
-              placeholder="+1 (555) 000-0000"
-            />
-
-            <div style={{
-              ...glass.panel,
-              padding: "12px", marginBottom: "14px",
-            }}>
-              <p style={{ fontSize: "11px", fontWeight: 600, color: colors.textSecondary, margin: "0 0 6px", fontFamily: fonts.system }}>Your donation summary</p>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", marginBottom: "3px" }}>
-                <span style={{ color: colors.textSecondary, fontFamily: fonts.system }}>{selectedCause?.label}</span>
-                <span style={{ fontWeight: 700, color: colors.accent, fontFamily: fonts.system }}>${selectedAmount}</span>
+              placeholder="+1 (555) 000-0000" />
+            <div style={{ ...glass.panel, padding: "12px", marginBottom: "14px" }}>
+              <p style={{ fontSize: "12px", fontWeight: 600, color: colors.textSecondary, margin: "0 0 6px", fontFamily: fonts.caption, textTransform: "uppercase", letterSpacing: "0.04em" }}>Your donation summary</p>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", marginBottom: "3px" }}>
+                <span style={{ color: colors.textSecondary, fontFamily: fonts.body }}>{selectedCause?.label}</span>
+                <span style={{ fontWeight: 700, color: colors.accent, fontFamily: fonts.ui }}>${selectedAmount}</span>
               </div>
-              <div style={{ fontSize: "11px", color: colors.textTertiary, fontFamily: fonts.system }}>
+              <div style={{ fontSize: "12px", color: colors.textTertiary, fontFamily: fonts.body }}>
                 {selectedPartner?.name} -- {selectedCountry?.name}
               </div>
             </div>
-
             <div style={{ marginTop: "auto" }}>
-              <Btn onClick={() => {
-                if (validateDonorInfo()) navigate(screens.CONFIRM);
-              }}>
-                Review Donation
-              </Btn>
+              <Btn onClick={() => { if (validateDonorInfo()) navigate(screens.CONFIRM); }}>Review Donation</Btn>
             </div>
           </div>
         );
 
-      // ==================== CONFIRM ====================
       case screens.CONFIRM:
         return (
           <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
@@ -973,16 +858,12 @@ export default function Amelior8App() {
                 width: "52px", height: "52px", borderRadius: "50%",
                 background: colors.accentLight, margin: "0 auto 10px",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                border: `1px solid rgba(212, 96, 58, 0.15)`,
+                border: `1px solid rgba(204, 86, 2, 0.12)`,
               }}>{renderIcon(selectedCause?.icon, 26, colors.accent)}</div>
-              <p style={{ fontSize: "32px", fontWeight: 800, color: colors.text, margin: "0 0 4px", fontFamily: fonts.system, letterSpacing: "-0.03em" }}>${selectedAmount}</p>
-              <p style={{ fontSize: "13px", color: colors.textSecondary, margin: 0, fontFamily: fonts.system }}>to {selectedPartner?.name}</p>
+              <p style={{ fontSize: "32px", fontWeight: 700, color: colors.text, margin: "0 0 4px", fontFamily: fonts.display, letterSpacing: "-0.05em" }}>${selectedAmount}</p>
+              <p style={{ fontSize: "14px", color: colors.textSecondary, margin: 0, fontFamily: fonts.body }}>to {selectedPartner?.name}</p>
             </div>
-
-            <div style={{
-              ...glass.panel,
-              padding: "14px", marginBottom: "14px",
-            }}>
+            <div style={{ ...glass.panel, padding: "14px", marginBottom: "14px" }}>
               {[
                 { l: "Donor", v: donorInfo.name },
                 { l: "Email", v: donorInfo.email },
@@ -995,39 +876,31 @@ export default function Amelior8App() {
                   display: "flex", justifyContent: "space-between", padding: "7px 0",
                   borderBottom: i < 5 ? `1px solid ${colors.divider}` : "none"
                 }}>
-                  <span style={{ fontSize: "12px", color: colors.textSecondary, fontFamily: fonts.system }}>{r.l}</span>
+                  <span style={{ fontSize: "12px", color: colors.textSecondary, fontFamily: fonts.body }}>{r.l}</span>
                   <span style={{
-                    fontSize: "12px", fontWeight: r.bold ? 800 : 600,
+                    fontSize: "12px", fontWeight: r.bold ? 700 : 600,
                     color: r.bold ? colors.accent : colors.text,
-                    maxWidth: "170px", textAlign: "right", wordBreak: "break-word",
-                    fontFamily: fonts.system,
+                    maxWidth: "170px", textAlign: "right", wordBreak: "break-word", fontFamily: fonts.ui,
                   }}>{r.v}</span>
                 </div>
               ))}
             </div>
-
             <div style={{
-              ...glass.panelSuccess,
-              padding: "12px",
-              display: "flex", alignItems: "center", gap: "10px",
-              marginBottom: "14px",
+              ...glass.panelSuccess, padding: "12px",
+              display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px",
             }}>
               {Icon.video(18, colors.successText)}
-              <p style={{ fontSize: "12px", color: colors.successText, margin: 0, lineHeight: 1.4, fontFamily: fonts.system }}>
+              <p style={{ fontSize: "12px", color: colors.successText, margin: 0, lineHeight: 1.4, fontFamily: fonts.body }}>
                 You'll receive <strong>AI-verified video proof</strong> at <strong>{donorInfo.email}</strong> when your donation is delivered.
               </p>
             </div>
-
             <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: "8px" }}>
-              <Btn onClick={() => navigate(screens.PROCESSING)}>
-                Confirm & Donate ${selectedAmount}
-              </Btn>
+              <Btn onClick={() => navigate(screens.PROCESSING)}>Confirm & Donate ${selectedAmount}</Btn>
               <Btn primary={false} onClick={goBack}>Go Back</Btn>
             </div>
           </div>
         );
 
-      // ==================== PROCESSING ====================
       case screens.PROCESSING:
         const steps = [
           { label: "Creating donor record...", done: processingStep >= 1 },
@@ -1043,31 +916,28 @@ export default function Amelior8App() {
               <>
                 <div style={{
                   width: "60px", height: "60px", borderRadius: "50%",
-                  border: "3px solid rgba(212, 96, 58, 0.15)",
-                  borderTopColor: colors.accent,
+                  border: `3px solid rgba(204, 86, 2, 0.15)`, borderTopColor: colors.accent,
                   animation: "spin 0.8s linear infinite", marginBottom: "24px",
                   boxShadow: `0 0 20px ${colors.accentGlow}`,
                 }} />
-                <p style={{ fontSize: "16px", fontWeight: 700, color: colors.text, margin: "0 0 20px", fontFamily: fonts.system }}>Processing donation...</p>
-
+                <p style={{ fontSize: "16px", fontWeight: 700, color: colors.text, margin: "0 0 20px", fontFamily: fonts.ui }}>Processing donation...</p>
                 <div style={{ width: "100%", maxWidth: "220px", textAlign: "left" }}>
                   {steps.map((s, i) => (
                     <div key={i} style={{
                       display: "flex", alignItems: "center", gap: "10px",
-                      marginBottom: "10px", opacity: processingStep >= i ? 1 : 0.3,
-                      transition: "opacity 0.4s ease"
+                      marginBottom: "10px", opacity: processingStep >= i ? 1 : 0.3, transition: "opacity 0.4s ease"
                     }}>
                       <div style={{
                         width: "22px", height: "22px", borderRadius: "50%", flexShrink: 0,
-                        background: s.done ? colors.success : "rgba(255,255,255,0.3)",
-                        border: s.done ? "none" : "1px solid rgba(255,255,255,0.5)",
+                        background: s.done ? colors.success : "rgba(240, 235, 225, 0.5)",
+                        border: s.done ? "none" : `1px solid rgba(107, 107, 82, 0.15)`,
                         display: "flex", alignItems: "center", justifyContent: "center",
                         transition: "all 0.3s ease",
-                        boxShadow: s.done ? "0 2px 8px rgba(52, 199, 89, 0.3)" : "none",
+                        boxShadow: s.done ? `0 2px 8px rgba(90, 138, 100, 0.3)` : "none",
                       }}>
-                        {s.done && Icon.check(12, "white")}
+                        {s.done && Icon.check(12, colors.cloudDancer)}
                       </div>
-                      <span style={{ fontSize: "12px", color: s.done ? colors.text : colors.textTertiary, fontWeight: 600, fontFamily: fonts.system }}>{s.label}</span>
+                      <span style={{ fontSize: "12px", color: s.done ? colors.text : colors.textTertiary, fontWeight: 600, fontFamily: fonts.ui }}>{s.label}</span>
                     </div>
                   ))}
                 </div>
@@ -1076,290 +946,206 @@ export default function Amelior8App() {
               <>
                 <div style={{
                   width: "60px", height: "60px", borderRadius: "50%",
-                  background: `linear-gradient(135deg, ${colors.success}, #2ebd52)`,
-                  marginBottom: "20px",
+                  background: colors.success, marginBottom: "20px",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  boxShadow: "0 6px 24px rgba(52, 199, 89, 0.3)",
-                }}>
-                  {Icon.check(28, "white")}
-                </div>
-                <p style={{ fontSize: "16px", fontWeight: 700, color: colors.text, margin: "0 0 6px", fontFamily: fonts.system }}>Donation sent!</p>
-                <p style={{ fontSize: "12px", color: colors.textTertiary, margin: 0, fontFamily: fonts.system }}>Preparing your QR code...</p>
+                  boxShadow: `0 6px 24px rgba(90, 138, 100, 0.3)`,
+                }}>{Icon.check(28, colors.cloudDancer)}</div>
+                <p style={{ fontSize: "16px", fontWeight: 700, color: colors.text, margin: "0 0 6px", fontFamily: fonts.ui }}>Donation sent!</p>
+                <p style={{ fontSize: "13px", color: colors.textTertiary, margin: 0, fontFamily: fonts.body }}>Preparing your QR code...</p>
               </>
             )}
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
           </div>
         );
 
-      // ==================== QR READY ====================
       case screens.QR_READY:
         const qrData = donorId || "UNKNOWN";
         return (
           <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
             <Header title="QR Code Ready" showBack={false} />
-
             <div style={{ textAlign: "center", marginBottom: "12px" }}>
               <div style={{
                 width: "44px", height: "44px", borderRadius: "50%",
-                background: "rgba(52, 199, 89, 0.1)", margin: "0 auto 10px",
+                background: "rgba(90, 138, 100, 0.1)", margin: "0 auto 10px",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                border: "1px solid rgba(52, 199, 89, 0.15)",
+                border: "1px solid rgba(90, 138, 100, 0.15)",
               }}>{Icon.check(22, colors.success)}</div>
-              <p style={{ fontSize: "16px", fontWeight: 800, color: colors.text, margin: "0 0 4px", fontFamily: fonts.system }}>
-                Donation confirmed!
-              </p>
-              <p style={{ fontSize: "12px", color: colors.textSecondary, margin: 0, fontFamily: fonts.system }}>
-                ${selectedAmount} to {selectedPartner?.name}
-              </p>
+              <p style={{ fontSize: "16px", fontWeight: 700, color: colors.text, margin: "0 0 4px", fontFamily: fonts.ui }}>Donation confirmed!</p>
+              <p style={{ fontSize: "13px", color: colors.textSecondary, margin: 0, fontFamily: fonts.body }}>${selectedAmount} to {selectedPartner?.name}</p>
             </div>
-
             <div style={{
-              ...glass.panel,
-              padding: "18px", margin: "0 auto 12px",
-              textAlign: "center", width: "fit-content",
-              border: `1px solid rgba(212, 96, 58, 0.2)`,
+              ...glass.panel, padding: "18px", margin: "0 auto 12px",
+              textAlign: "center", width: "fit-content", border: `1px solid rgba(204, 86, 2, 0.15)`,
             }}>
               <QRCode data={qrData} size={150} />
               <div style={{ height: "10px" }} />
-              <p style={{
-                fontSize: "13px", fontWeight: 800, color: colors.text,
-                fontFamily: fonts.mono, letterSpacing: "0.08em", margin: 0
-              }}>{qrData}</p>
+              <p style={{ fontSize: "13px", fontWeight: 700, color: colors.text, fontFamily: fonts.mono, letterSpacing: "0.08em", margin: 0 }}>{qrData}</p>
             </div>
-
-            <div style={{
-              ...glass.panelAccent,
-              padding: "12px", marginBottom: "10px",
-            }}>
-              <p style={{ fontSize: "12px", fontWeight: 700, color: colors.accent, margin: "0 0 4px", fontFamily: fonts.system }}>
-                Print this QR code & attach it to the gift
-              </p>
-              <p style={{ fontSize: "11px", color: colors.textSecondary, margin: 0, lineHeight: 1.5, fontFamily: fonts.system }}>
+            <div style={{ ...glass.panelAccent, padding: "12px", marginBottom: "10px" }}>
+              <p style={{ fontSize: "12px", fontWeight: 700, color: colors.accent, margin: "0 0 4px", fontFamily: fonts.ui }}>Print this QR code & attach it to the gift</p>
+              <p style={{ fontSize: "12px", color: colors.textSecondary, margin: 0, lineHeight: 1.5, fontFamily: fonts.body }}>
                 When the partner scans this code at the Beacon, the system will automatically record the handoff and email you the video at <strong>{donorInfo.email}</strong>.
               </p>
             </div>
-
             <div style={{
-              ...glass.panelSuccess,
-              padding: "10px 12px", marginBottom: "10px",
+              ...glass.panelSuccess, padding: "10px 12px", marginBottom: "10px",
               display: "flex", alignItems: "center", gap: "8px",
             }}>
               {Icon.mail(14, colors.successText)}
-              <p style={{ fontSize: "11px", color: colors.successText, margin: 0, fontWeight: 600, fontFamily: fonts.system }}>
-                A copy of this QR code has been sent to the partner.
-              </p>
+              <p style={{ fontSize: "11px", color: colors.successText, margin: 0, fontWeight: 600, fontFamily: fonts.ui }}>A copy of this QR code has been sent to the partner.</p>
             </div>
-
             <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: "8px" }}>
-              <Btn onClick={() => navigate(screens.TRACKING)}>
-                Track My Donation
-              </Btn>
+              <Btn onClick={() => navigate(screens.TRACKING)}>Track My Donation</Btn>
               <Btn primary={false} onClick={resetAll}>Back to Home</Btn>
             </div>
           </div>
         );
 
-      // ==================== TRACKING ====================
       case screens.TRACKING:
         return (
           <div style={{ display: "flex", flexDirection: "column", height: "100%", position: "relative" }}>
             <Header title="My Donations" showBack={true}
               rightAction={<div style={{
                 width: "28px", height: "28px", borderRadius: "10px",
-                background: colors.accentLight,
-                display: "flex", alignItems: "center", justifyContent: "center",
+                background: colors.accentLight, display: "flex", alignItems: "center", justifyContent: "center",
                 position: "relative",
               }}>
                 {Icon.bell(14, colors.accent)}
                 {showNotification && <div style={{
                   position: "absolute", top: "-2px", right: "-2px",
                   width: "10px", height: "10px", borderRadius: "50%",
-                  background: colors.accent,
-                  border: "2px solid rgba(255,255,255,0.8)",
+                  background: colors.accent, border: `2px solid ${colors.cloudDancer}`,
                   boxShadow: `0 0 6px ${colors.accentGlow}`,
                 }} />}
               </div>}
             />
-
             {showNotification && (
               <div onClick={() => { setShowNotification(false); navigate(screens.VIDEO); }} style={{
-                ...glass.panel,
-                padding: "14px", marginBottom: "12px", cursor: "pointer",
-                border: `1px solid rgba(212, 96, 58, 0.25)`,
-                boxShadow: `0 4px 24px ${colors.accentGlow}`,
-                animation: "slideDown 0.3s ease",
+                ...glass.panel, padding: "14px", marginBottom: "12px", cursor: "pointer",
+                border: `1px solid rgba(204, 86, 2, 0.2)`,
+                boxShadow: `0 4px 24px ${colors.accentGlow}`, animation: "slideDown 0.3s ease",
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                   {Icon.video(20, colors.accent)}
                   <div style={{ flex: 1 }}>
-                    <p style={{ fontSize: "12px", fontWeight: 700, color: colors.accent, margin: "0 0 2px", fontFamily: fonts.system }}>Video proof ready!</p>
-                    <p style={{ fontSize: "11px", color: colors.textSecondary, margin: 0, fontFamily: fonts.system }}>Tap to watch your impact</p>
+                    <p style={{ fontSize: "12px", fontWeight: 700, color: colors.accent, margin: "0 0 2px", fontFamily: fonts.ui }}>Video proof ready!</p>
+                    <p style={{ fontSize: "12px", color: colors.textSecondary, margin: 0, fontFamily: fonts.body }}>Tap to watch your impact</p>
                   </div>
                   {Icon.chevronRight(16, colors.accent)}
                 </div>
               </div>
             )}
-
-            <div onClick={() => navigate(screens.VIDEO)} style={{
-              ...glass.panel,
-              padding: "16px", marginBottom: "10px", cursor: "pointer",
-            }}>
+            <div onClick={() => navigate(screens.VIDEO)} style={{ ...glass.panel, padding: "16px", marginBottom: "10px", cursor: "pointer" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: "12px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                   <div style={{
                     width: "40px", height: "40px", borderRadius: "12px",
-                    background: `${selectedCause?.color || "#3b82f6"}12`,
-                    border: `1px solid ${selectedCause?.color || "#3b82f6"}20`,
+                    background: `${selectedCause?.color || "#7A9A94"}15`, border: `1px solid ${selectedCause?.color || "#7A9A94"}25`,
                     display: "flex", alignItems: "center", justifyContent: "center",
-                  }}>{renderIcon(selectedCause?.icon || "droplet", 20, selectedCause?.color || "#3b82f6")}</div>
+                  }}>{renderIcon(selectedCause?.icon || "droplet", 20, selectedCause?.color || "#7A9A94")}</div>
                   <div>
-                    <p style={{ fontSize: "13px", fontWeight: 700, color: colors.text, margin: "0 0 1px", fontFamily: fonts.system }}>{selectedPartner?.name || "Maji Safi Initiative"}</p>
-                    <p style={{ fontSize: "11px", color: colors.textTertiary, margin: 0, fontFamily: fonts.system }}>{selectedCountry?.name || "Kenya"} -- {selectedCause?.label || "Water"}</p>
+                    <p style={{ fontSize: "13px", fontWeight: 700, color: colors.text, margin: "0 0 1px", fontFamily: fonts.ui }}>{selectedPartner?.name || "Maji Safi Initiative"}</p>
+                    <p style={{ fontSize: "12px", color: colors.textTertiary, margin: 0, fontFamily: fonts.body }}>{selectedCountry?.name || "Kenya"} -- {selectedCause?.label || "Water"}</p>
                   </div>
                 </div>
-                <span style={{ fontSize: "15px", fontWeight: 800, color: colors.accent, fontFamily: fonts.system }}>${selectedAmount || 100}</span>
+                <span style={{ fontSize: "15px", fontWeight: 700, color: colors.accent, fontFamily: fonts.display }}>${selectedAmount || 100}</span>
               </div>
-
               {donorId && (
                 <div style={{
-                  ...glass.panelLight,
-                  borderRadius: "10px", padding: "6px 10px",
+                  ...glass.panelLight, borderRadius: "10px", padding: "6px 10px",
                   marginBottom: "10px", display: "flex", alignItems: "center", gap: "6px"
                 }}>
                   {Icon.tag(12, colors.textSecondary)}
-                  <span style={{ fontSize: "11px", fontWeight: 700, color: colors.textSecondary, fontFamily: fonts.mono }}>
-                    {donorId}
-                  </span>
+                  <span style={{ fontSize: "11px", fontWeight: 700, color: colors.textSecondary, fontFamily: fonts.mono }}>{donorId}</span>
                 </div>
               )}
-
               <div style={{ display: "flex", alignItems: "center", gap: "0", marginBottom: "4px" }}>
                 {["Sent", "Received", "Delivered", "Verified"].map((s, i) => (
                   <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center" }}>
                     <div style={{
                       width: "24px", height: "24px", borderRadius: "50%",
-                      background: i <= 3 ? `linear-gradient(135deg, ${colors.success}, #2ebd52)` : "rgba(255,255,255,0.35)",
-                      border: i <= 3 ? "none" : "1px solid rgba(255,255,255,0.5)",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      marginBottom: "4px",
-                      boxShadow: i <= 3 ? "0 2px 6px rgba(52, 199, 89, 0.25)" : "none",
-                    }}>
-                      {Icon.check(12, i <= 3 ? "white" : colors.textTertiary)}
-                    </div>
-                    <span style={{ fontSize: "9px", color: i <= 3 ? colors.successText : colors.textTertiary, fontWeight: 600, fontFamily: fonts.system }}>{s}</span>
+                      background: i <= 3 ? colors.success : "rgba(240, 235, 225, 0.5)",
+                      border: i <= 3 ? "none" : `1px solid rgba(107, 107, 82, 0.12)`,
+                      display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "4px",
+                      boxShadow: i <= 3 ? `0 2px 6px rgba(90, 138, 100, 0.25)` : "none",
+                    }}>{Icon.check(12, i <= 3 ? colors.cloudDancer : colors.textTertiary)}</div>
+                    <span style={{ fontSize: "9px", color: i <= 3 ? colors.successText : colors.textTertiary, fontWeight: 600, fontFamily: fonts.caption, textTransform: "uppercase", letterSpacing: "0.04em" }}>{s}</span>
                   </div>
                 ))}
               </div>
             </div>
-
-            <div style={{
-              ...glass.panel,
-              padding: "16px", opacity: 0.55,
-            }}>
+            <div style={{ ...glass.panel, padding: "16px", opacity: 0.55 }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <div style={{
                   width: "40px", height: "40px", borderRadius: "12px",
-                  background: "#8b5cf612", border: "1px solid #8b5cf620",
+                  background: "#6B6B5215", border: "1px solid #6B6B5225",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                }}>{Icon.book(20, "#8b5cf6")}</div>
+                }}>{Icon.book(20, colors.oliveDrab)}</div>
                 <div style={{ flex: 1 }}>
-                  <p style={{ fontSize: "13px", fontWeight: 700, color: colors.text, margin: "0 0 1px", fontFamily: fonts.system }}>Bright Futures Academy</p>
-                  <p style={{ fontSize: "11px", color: colors.textTertiary, margin: 0, fontFamily: fonts.system }}>Uganda -- Education</p>
+                  <p style={{ fontSize: "13px", fontWeight: 700, color: colors.text, margin: "0 0 1px", fontFamily: fonts.ui }}>Bright Futures Academy</p>
+                  <p style={{ fontSize: "12px", color: colors.textTertiary, margin: 0, fontFamily: fonts.body }}>Uganda -- Education</p>
                 </div>
-                <span style={{ fontSize: "15px", fontWeight: 800, color: colors.textTertiary, fontFamily: fonts.system }}>$50</span>
+                <span style={{ fontSize: "15px", fontWeight: 700, color: colors.textTertiary, fontFamily: fonts.display }}>$50</span>
               </div>
             </div>
-
-            <div style={{ marginTop: "auto" }}>
-              <Btn onClick={() => { resetAll(); }}>Give Again</Btn>
-            </div>
-
+            <div style={{ marginTop: "auto" }}><Btn onClick={resetAll}>Give Again</Btn></div>
             <style>{`@keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }`}</style>
           </div>
         );
 
-      // ==================== VIDEO ====================
       case screens.VIDEO:
         return (
           <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
             <Header title="Impact Proof" />
-
             <div onClick={() => { if (!isPlaying && videoProgress < 100) setIsPlaying(true); }} style={{
               borderRadius: "18px", overflow: "hidden", marginBottom: "12px",
-              position: "relative", height: "175px",
-              cursor: "pointer",
-              background: "linear-gradient(135deg, #0f1a2e, #1a2e1a)",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+              position: "relative", height: "175px", cursor: "pointer",
+              background: `linear-gradient(135deg, ${colors.charcoal}, #1a2e1a)`,
+              boxShadow: "0 8px 32px rgba(44,44,42,0.2)",
             }}>
-              <div style={{
-                position: "absolute", inset: 0, display: "flex",
-                flexDirection: "column", alignItems: "center", justifyContent: "center",
-              }}>
+              <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
                 {!isPlaying && videoProgress === 0 && (
                   <div style={{
                     width: "52px", height: "52px", borderRadius: "50%",
-                    background: "rgba(255,255,255,0.2)",
-                    backdropFilter: "blur(16px)",
-                    WebkitBackdropFilter: "blur(16px)",
-                    border: "1px solid rgba(255,255,255,0.3)",
+                    background: "rgba(240, 235, 225, 0.15)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
+                    border: "1px solid rgba(240, 235, 225, 0.25)",
                     display: "flex", alignItems: "center", justifyContent: "center",
                     boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
-                  }}>
-                    {Icon.play(20, "rgba(255,255,255,0.95)")}
-                  </div>
+                  }}>{Icon.play(20, "rgba(240, 235, 225, 0.95)")}</div>
                 )}
                 {isPlaying && (
-                  <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "13px", fontWeight: 600, fontFamily: fonts.system }}>
-                    Recording playback...
-                  </p>
+                  <p style={{ color: "rgba(240, 235, 225, 0.7)", fontSize: "13px", fontWeight: 600, fontFamily: fonts.ui }}>Recording playback...</p>
                 )}
                 {videoProgress >= 100 && !isPlaying && (
                   <div style={{ textAlign: "center" }}>
                     <div style={{
                       width: "40px", height: "40px", borderRadius: "50%",
-                      background: "rgba(52, 199, 89, 0.2)",
-                      backdropFilter: "blur(12px)",
-                      WebkitBackdropFilter: "blur(12px)",
-                      border: "1px solid rgba(52, 199, 89, 0.3)",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      margin: "0 auto 6px",
-                    }}>{Icon.check(20, "white")}</div>
-                    <p style={{ color: "white", fontSize: "13px", fontWeight: 600, margin: 0, fontFamily: fonts.system }}>Delivery Verified</p>
+                      background: "rgba(90, 138, 100, 0.2)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
+                      border: "1px solid rgba(90, 138, 100, 0.3)",
+                      display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px",
+                    }}>{Icon.check(20, colors.cloudDancer)}</div>
+                    <p style={{ color: colors.cloudDancer, fontSize: "13px", fontWeight: 600, margin: 0, fontFamily: fonts.ui }}>Delivery Verified</p>
                   </div>
                 )}
               </div>
-
               <div style={{
                 position: "absolute", top: "10px", right: "10px",
-                background: "rgba(255,255,255,0.15)",
-                backdropFilter: "blur(16px)",
-                WebkitBackdropFilter: "blur(16px)",
-                borderRadius: "20px",
-                padding: "4px 10px", display: "flex", alignItems: "center", gap: "4px",
-                border: "1px solid rgba(255,255,255,0.2)",
+                background: "rgba(240, 235, 225, 0.12)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
+                borderRadius: "20px", padding: "4px 10px", display: "flex", alignItems: "center", gap: "4px",
+                border: "1px solid rgba(240, 235, 225, 0.18)",
               }}>
                 <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: colors.success }} />
-                <span style={{ fontSize: "10px", fontWeight: 700, color: "rgba(255,255,255,0.9)", fontFamily: fonts.system }}>AI Verified</span>
+                <span style={{ fontSize: "10px", fontWeight: 700, color: "rgba(240, 235, 225, 0.9)", fontFamily: fonts.caption }}>AI Verified</span>
               </div>
-
-              <div style={{
-                position: "absolute", bottom: 0, left: 0, right: 0,
-                height: "3px", background: "rgba(255,255,255,0.15)",
-              }}>
+              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "3px", background: "rgba(240, 235, 225, 0.12)" }}>
                 <div style={{
-                  height: "100%", width: `${videoProgress}%`,
-                  background: `linear-gradient(90deg, ${colors.accent}, #e8845c)`,
-                  transition: "width 0.1s linear",
-                  boxShadow: `0 0 8px ${colors.accentGlow}`,
+                  height: "100%", width: `${videoProgress}%`, background: colors.accent,
+                  transition: "width 0.1s linear", boxShadow: `0 0 8px ${colors.accentGlow}`,
                 }} />
               </div>
             </div>
-
-            <div style={{
-              ...glass.panel,
-              padding: "14px", marginBottom: "10px",
-            }}>
-              <p style={{ fontSize: "11px", fontWeight: 600, color: colors.textSecondary, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: fonts.system }}>Delivery Details</p>
+            <div style={{ ...glass.panel, padding: "14px", marginBottom: "10px" }}>
+              <p style={{ fontSize: "12px", fontWeight: 600, color: colors.textSecondary, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: fonts.caption }}>Delivery Details</p>
               {[
                 { l: "Recipient", v: "Joseph M." },
                 { l: "Donor", v: donorInfo.name || "You" },
@@ -1369,32 +1155,26 @@ export default function Amelior8App() {
                 { l: "Location", v: `${selectedPartner?.location || "Kisumu"}, ${selectedCountry?.name || "Kenya"}` },
                 { l: "Your Donation", v: `$${selectedAmount || 100}`, accent: true },
               ].map((r, i) => (
-                <div key={i} style={{
-                  display: "flex", justifyContent: "space-between", padding: "5px 0",
-                }}>
-                  <span style={{ fontSize: "12px", color: colors.textSecondary, fontFamily: fonts.system }}>{r.l}</span>
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0" }}>
+                  <span style={{ fontSize: "12px", color: colors.textSecondary, fontFamily: fonts.body }}>{r.l}</span>
                   <span style={{
                     fontSize: "12px", fontWeight: 600,
                     color: r.accent ? colors.accent : colors.text,
-                    fontFamily: r.mono ? fonts.mono : fonts.system,
+                    fontFamily: r.mono ? fonts.mono : fonts.ui,
                   }}>{r.v}</span>
                 </div>
               ))}
             </div>
-
             <div style={{
-              ...glass.panelSuccess,
-              padding: "10px 12px",
-              display: "flex", alignItems: "center", gap: "10px",
-              marginBottom: "10px",
+              ...glass.panelSuccess, padding: "10px 12px",
+              display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px",
             }}>
               {Icon.cpu(16, colors.successText)}
               <div>
-                <p style={{ fontSize: "11px", fontWeight: 700, color: colors.successText, margin: 0, fontFamily: fonts.system }}>Amelior8 AI Verified</p>
-                <p style={{ fontSize: "10px", color: "rgba(27, 94, 48, 0.7)", margin: 0, fontFamily: fonts.system }}>Handoff confirmed -- Recipient present</p>
+                <p style={{ fontSize: "11px", fontWeight: 700, color: colors.successText, margin: 0, fontFamily: fonts.ui }}>Amelior8 AI Verified</p>
+                <p style={{ fontSize: "10px", color: colors.dustyTeal, margin: 0, fontFamily: fonts.body }}>Handoff confirmed -- Recipient present</p>
               </div>
             </div>
-
             <div style={{ marginTop: "auto", display: "flex", gap: "8px" }}>
               <Btn onClick={() => navigate(screens.SHARE)} primary={false} style={{ flex: 1 }}>Share Proof</Btn>
               <Btn onClick={resetAll} style={{ flex: 1 }}>Give Again</Btn>
@@ -1402,7 +1182,6 @@ export default function Amelior8App() {
           </div>
         );
 
-      // ==================== SHARE ====================
       case screens.SHARE:
         return (
           <div style={{
@@ -1411,19 +1190,14 @@ export default function Amelior8App() {
           }}>
             <div style={{
               width: "72px", height: "72px", borderRadius: "50%",
-              background: `linear-gradient(135deg, rgba(212, 96, 58, 0.15), rgba(212, 96, 58, 0.05))`,
-              border: "1px solid rgba(212, 96, 58, 0.15)",
-              margin: "0 0 20px",
-              display: "flex", alignItems: "center", justifyContent: "center",
+              background: colors.accentLight, border: `1px solid rgba(204, 86, 2, 0.12)`,
+              margin: "0 0 20px", display: "flex", alignItems: "center", justifyContent: "center",
             }}>{Icon.share(32, colors.accent)}</div>
-            <h2 style={{ fontFamily: fonts.system, fontSize: "22px", fontWeight: 800, color: colors.text, margin: "0 0 8px", letterSpacing: "-0.02em" }}>Impact Shared!</h2>
-            <p style={{ fontSize: "13px", color: colors.textSecondary, margin: "0 0 24px", lineHeight: 1.5, padding: "0 10px", fontFamily: fonts.system }}>
+            <h2 style={{ fontFamily: fonts.display, fontSize: "22px", fontWeight: 700, color: colors.text, margin: "0 0 8px", letterSpacing: "-0.05em" }}>Impact Shared!</h2>
+            <p style={{ fontSize: "14px", color: colors.textSecondary, margin: "0 0 24px", lineHeight: 1.5, padding: "0 10px", fontFamily: fonts.body }}>
               Your verified proof of impact has been copied. Share it on social media to inspire others to give transparently.
             </p>
-
-            <div style={{
-              display: "flex", gap: "14px", marginBottom: "32px"
-            }}>
+            <div style={{ display: "flex", gap: "14px", marginBottom: "32px" }}>
               {[
                 { icon: "copy", label: "Copy" },
                 { icon: "chat", label: "Message" },
@@ -1431,13 +1205,10 @@ export default function Amelior8App() {
               ].map((item, i) => (
                 <div key={i} style={{
                   width: "52px", height: "52px", borderRadius: "16px",
-                  ...glass.panel,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  cursor: "pointer",
+                  ...glass.panel, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
                 }}>{Icon[item.icon](22, colors.text)}</div>
               ))}
             </div>
-
             <Btn onClick={resetAll} style={{ width: "100%" }}>Back to Home</Btn>
           </div>
         );
@@ -1451,44 +1222,37 @@ export default function Amelior8App() {
     <div style={{
       minHeight: "100vh",
       background: `
-        radial-gradient(ellipse at 15% 30%, rgba(120, 119, 198, 0.25), transparent 55%),
-        radial-gradient(ellipse at 85% 15%, rgba(255, 175, 140, 0.22), transparent 50%),
-        radial-gradient(ellipse at 35% 80%, rgba(135, 200, 240, 0.2), transparent 50%),
-        radial-gradient(ellipse at 75% 65%, rgba(180, 130, 200, 0.15), transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(255, 220, 200, 0.1), transparent 60%),
-        linear-gradient(160deg, #f0ecff 0%, #e6f2f8 35%, #fef0e8 70%, #f5eff8 100%)
+        radial-gradient(ellipse at 15% 30%, rgba(122, 154, 148, 0.2), transparent 55%),
+        radial-gradient(ellipse at 85% 15%, rgba(204, 86, 2, 0.08), transparent 50%),
+        radial-gradient(ellipse at 35% 80%, rgba(107, 107, 82, 0.12), transparent 50%),
+        radial-gradient(ellipse at 75% 65%, rgba(122, 154, 148, 0.1), transparent 50%),
+        linear-gradient(160deg, #F0EBE1 0%, #E8E2D6 35%, #F0EBE1 70%, #E5DFD3 100%)
       `,
       display: "flex", flexDirection: "column", alignItems: "center",
       justifyContent: "center", padding: "40px 20px",
-      fontFamily: fonts.system,
+      fontFamily: fonts.ui,
     }}>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-      {/* Phone frame — glass */}
       <div style={{
         width: "320px", height: "640px", borderRadius: "44px",
-        background: "rgba(255, 255, 255, 0.2)",
+        background: "rgba(240, 235, 225, 0.3)",
         backdropFilter: "blur(40px) saturate(200%)",
         WebkitBackdropFilter: "blur(40px) saturate(200%)",
-        border: "1px solid rgba(255, 255, 255, 0.5)",
+        border: "1px solid rgba(240, 235, 225, 0.6)",
         position: "relative", overflow: "hidden",
         boxShadow: `
-          0 40px 100px rgba(0, 0, 0, 0.1),
-          0 10px 40px rgba(0, 0, 0, 0.06),
-          inset 0 2px 0 rgba(255, 255, 255, 0.6),
-          inset 0 -1px 0 rgba(255, 255, 255, 0.2)
+          0 40px 100px rgba(44, 44, 42, 0.1),
+          0 10px 40px rgba(44, 44, 42, 0.06),
+          inset 0 2px 0 rgba(255, 255, 255, 0.4),
+          inset 0 -1px 0 rgba(240, 235, 225, 0.3)
         `,
       }}>
-        {/* Dynamic Island */}
         <div style={{
           position: "absolute", top: "8px", left: "50%", transform: "translateX(-50%)",
-          width: "100px", height: "28px",
-          background: "#0a0a0e",
-          borderRadius: "20px", zIndex: 10,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+          width: "100px", height: "28px", background: colors.charcoal,
+          borderRadius: "20px", zIndex: 10, boxShadow: "0 2px 8px rgba(44,44,42,0.15)",
         }} />
-
-        {/* Screen content */}
         <div style={{
           padding: "48px 20px 20px", height: "100%", boxSizing: "border-box",
           display: "flex", flexDirection: "column", overflowY: "auto",
@@ -1497,10 +1261,9 @@ export default function Amelior8App() {
         </div>
       </div>
 
-      {/* Caption */}
       <div style={{ marginTop: "24px", textAlign: "center" }}>
-        <p style={{ fontSize: "11px", color: "rgba(0,0,0,0.3)", margin: 0, fontFamily: fonts.system, letterSpacing: "0.02em" }}>
-          amelior8 -- Interactive App Prototype
+        <p style={{ fontSize: "11px", color: colors.textTertiary, margin: 0, fontFamily: fonts.body, letterSpacing: "0.02em" }}>
+          Amelior8 -- Interactive App Prototype
         </p>
       </div>
     </div>
