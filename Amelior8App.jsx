@@ -308,6 +308,37 @@ const Icon = {
       <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
     </svg>
   ),
+  user: (s = 20, c = "currentColor") => (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" />
+    </svg>
+  ),
+  home: (s = 20, c = "currentColor") => (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  ),
+  plus: (s = 20, c = "currentColor") => (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+  ),
+  barChart: (s = 20, c = "currentColor") => (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
+    </svg>
+  ),
+  gift: (s = 20, c = "currentColor") => (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 12 20 22 4 22 4 12" /><rect x="2" y="7" width="20" height="5" /><line x1="12" y1="22" x2="12" y2="7" />
+      <path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z" /><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" />
+    </svg>
+  ),
+  settings: (s = 20, c = "currentColor") => (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.32 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+    </svg>
+  ),
 };
 
 // ============================================================
@@ -602,54 +633,141 @@ export default function Amelior8App() {
   const renderScreen = () => {
     switch (screen) {
 
-      case screens.HOME:
+      case screens.HOME: {
+        const firstName = donorInfo.name ? donorInfo.name.split(" ")[0] : "";
+        const hasDonation = !!donorId;
+        const donationSteps = ["Donated", "Received", "Delivered", "Verified"];
+        const currentStep = hasDonation ? 3 : 2;
         return (
-          <div style={{ display: "flex", flexDirection: "column", height: "100%", justifyContent: "space-between" }}>
-            <div>
-              <div style={{ textAlign: "center", padding: "24px 0 20px" }}>
-                <div style={{
-                  width: "60px", height: "60px", borderRadius: "18px",
-                  background: colors.accent, margin: "0 auto 14px",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  boxShadow: `0 8px 28px ${colors.accentGlow}`,
-                }}>
-                  {Icon.globe(28, colors.cloudDancer)}
-                </div>
-                <h1 style={{
-                  fontFamily: fonts.display, fontSize: "28px", fontWeight: 700,
-                  color: colors.accent, margin: "0 0 4px", letterSpacing: "-0.05em",
-                }}>Amelior8</h1>
-                <p style={{ fontSize: "14px", color: colors.textSecondary, fontStyle: "italic", margin: 0, fontFamily: fonts.body }}>Making giving visible.</p>
-              </div>
-
-              <div style={{
-                ...glass.panelAccent, padding: "14px 16px", margin: "0 0 14px",
+          <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+            {/* Welcome header */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "4px 0 18px" }}>
+              <h1 style={{
+                fontFamily: fonts.display, fontSize: "26px", fontWeight: 700,
+                color: colors.text, margin: 0, letterSpacing: "-0.05em", lineHeight: 1.15,
               }}>
-                <p style={{ fontSize: "13px", fontWeight: 700, color: colors.accent, margin: "0 0 4px", fontFamily: fonts.ui }}>Direct. Transparent. Verified.</p>
-                <p style={{ fontSize: "13px", color: colors.textSecondary, margin: 0, lineHeight: 1.5, fontFamily: fonts.body }}>
-                  Donate directly to local NGOs. Receive AI-verified video proof of your impact. No intermediaries.
-                </p>
-              </div>
+                Welcome{firstName ? ` back,` : ","}<br />{firstName || "Donor"}
+              </h1>
+              <div style={{
+                width: "38px", height: "38px", borderRadius: "50%",
+                background: colors.charcoal, display: "flex", alignItems: "center", justifyContent: "center",
+                flexShrink: 0, marginTop: "2px",
+              }}>{Icon.user(18, colors.cloudDancer)}</div>
+            </div>
 
-              <div style={{ display: "flex", gap: "8px", marginBottom: "14px" }}>
-                {[
-                  { n: "0%", l: "Middlemen" },
-                  { n: "100%", l: "Transparent" },
-                  { n: "AI", l: "Verified" },
-                ].map((s, i) => (
-                  <div key={i} style={{ flex: 1, textAlign: "center", ...glass.panelLight, padding: "12px 6px" }}>
-                    <p style={{ fontSize: "18px", fontWeight: 700, color: colors.text, margin: "0 0 2px", fontFamily: fonts.display, letterSpacing: "-0.03em" }}>{s.n}</p>
-                    <p style={{ fontSize: "10px", color: colors.textTertiary, margin: 0, fontFamily: fonts.caption, textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.l}</p>
-                  </div>
+            {/* Active donation status card */}
+            <div style={{ ...glass.panel, padding: "16px", marginBottom: "16px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
+                <div style={{ flex: 1, paddingRight: "12px" }}>
+                  <p style={{ fontSize: "14px", fontWeight: 700, color: colors.text, margin: "0 0 3px", fontFamily: fonts.ui, lineHeight: 1.3 }}>
+                    {hasDonation ? "Delivered! Your donation reached the recipient" : "Your donation is being processed"}
+                  </p>
+                  <p style={{ fontSize: "13px", color: colors.accent, margin: 0, fontFamily: fonts.body }}>
+                    {selectedCause?.label || "Clean Water"} Project
+                  </p>
+                </div>
+                <div style={{
+                  width: "48px", height: "48px", borderRadius: "14px",
+                  background: colors.accentLight, display: "flex", alignItems: "center", justifyContent: "center",
+                  flexShrink: 0,
+                }}>{renderIcon(selectedCause?.icon || "droplet", 24, colors.accent)}</div>
+              </div>
+              {/* Progress steps */}
+              <div style={{ display: "flex", gap: "3px", marginBottom: "6px" }}>
+                {donationSteps.map((_, i) => (
+                  <div key={i} style={{
+                    flex: 1, height: "3px", borderRadius: "2px",
+                    background: i <= currentStep ? colors.accent : "rgba(107,107,82,0.15)",
+                  }} />
+                ))}
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                {donationSteps.map((s, i) => (
+                  <span key={i} style={{
+                    fontSize: "10px", fontWeight: 600, fontFamily: fonts.caption,
+                    color: i <= currentStep ? colors.text : colors.textTertiary,
+                  }}>{s}</span>
                 ))}
               </div>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <Btn onClick={() => navigate(screens.CAUSE)}>Start Giving</Btn>
-              <Btn primary={false} onClick={() => navigate(screens.TRACKING)}>View My Donations</Btn>
+
+            {/* Divider line */}
+            <div style={{ height: "1px", background: colors.divider, marginBottom: "16px" }} />
+
+            {/* My Donations section */}
+            <h2 style={{ fontFamily: fonts.ui, fontSize: "20px", fontWeight: 700, color: colors.text, margin: "0 0 12px" }}>My Donations</h2>
+            <div style={{ ...glass.panel, padding: "16px", marginBottom: "12px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+                <div style={{
+                  width: "44px", height: "44px", borderRadius: "14px",
+                  background: "#7A9A9415", border: "1px solid #7A9A9425",
+                  display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                }}>{Icon.droplet(22, "#7A9A94")}</div>
+                <div>
+                  <p style={{ fontSize: "14px", fontWeight: 700, color: colors.text, margin: "0 0 2px", fontFamily: fonts.ui }}>
+                    {selectedPartner?.name || "Maji Safi Initiative"}
+                  </p>
+                  <p style={{ fontSize: "12px", color: colors.textTertiary, margin: 0, fontFamily: fonts.body }}>
+                    ${selectedAmount || 100} · {selectedCause?.label || "Water"} · {selectedCountry?.name || "Kenya"}
+                  </p>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <div onClick={() => navigate(screens.CAUSE)} style={{
+                  flex: 1, padding: "10px", borderRadius: "12px", textAlign: "center",
+                  ...glass.panelLight, cursor: "pointer", fontSize: "13px", fontWeight: 600,
+                  color: colors.textSecondary, fontFamily: fonts.ui,
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
+                }}>
+                  {Icon.send(14, colors.textSecondary)} Donate Again
+                </div>
+                <div onClick={() => navigate(screens.VIDEO)} style={{
+                  flex: 1, padding: "10px", borderRadius: "12px", textAlign: "center",
+                  border: `1px solid rgba(107, 107, 82, 0.15)`, cursor: "pointer",
+                  fontSize: "13px", fontWeight: 600, color: colors.text, fontFamily: fonts.ui,
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
+                }}>
+                  {Icon.settings(14, colors.text)} Manage
+                </div>
+              </div>
+            </div>
+
+            {/* Add Donation CTA */}
+            <div onClick={() => navigate(screens.CAUSE)} style={{
+              padding: "14px", borderRadius: "16px", textAlign: "center",
+              background: colors.charcoal, color: colors.cloudDancer,
+              fontWeight: 700, fontSize: "14px", cursor: "pointer",
+              fontFamily: fonts.ui, marginBottom: "16px",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
+              boxShadow: "0 4px 20px rgba(44,44,42,0.15)",
+            }}>
+              {Icon.plus(16, colors.cloudDancer)} Make a Donation
+            </div>
+
+            {/* Featured cause banner */}
+            <div onClick={() => navigate(screens.CAUSE)} style={{
+              borderRadius: "20px", overflow: "hidden", position: "relative",
+              height: "100px", cursor: "pointer",
+              background: `linear-gradient(135deg, #CC5602 0%, #A0461A 50%, #8B5A2B 100%)`,
+            }}>
+              <div style={{
+                position: "absolute", inset: 0, padding: "16px",
+                display: "flex", flexDirection: "column", justifyContent: "flex-end",
+                background: "linear-gradient(0deg, rgba(44,44,42,0.35) 0%, transparent 60%)",
+              }}>
+                <span style={{
+                  background: "rgba(240,235,225,0.2)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
+                  borderRadius: "8px", padding: "3px 10px", fontSize: "10px",
+                  fontWeight: 700, color: colors.cloudDancer, fontFamily: fonts.caption,
+                  width: "fit-content", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.06em",
+                }}>Featured</span>
+                <p style={{ fontSize: "15px", fontWeight: 700, color: colors.cloudDancer, margin: 0, fontFamily: fonts.ui }}>Clean Water Initiative</p>
+                <p style={{ fontSize: "11px", color: "rgba(240,235,225,0.7)", margin: 0, fontFamily: fonts.body }}>12 active projects in East Africa</p>
+              </div>
             </div>
           </div>
         );
+      }
 
       case screens.CAUSE:
         return (
@@ -1218,6 +1336,14 @@ export default function Amelior8App() {
     }
   };
 
+  const showBottomNav = [screens.HOME, screens.TRACKING].includes(screen);
+  const navTabs = [
+    { icon: "home", label: "Home", target: screens.HOME },
+    { icon: "heart", label: "Give", target: screens.CAUSE },
+    { icon: "barChart", label: "Impact", target: screens.TRACKING },
+    { icon: "user", label: "Profile", target: null },
+  ];
+
   return (
     <div style={{
       minHeight: "100vh",
@@ -1253,11 +1379,43 @@ export default function Amelior8App() {
           width: "100px", height: "28px", background: colors.charcoal,
           borderRadius: "20px", zIndex: 10, boxShadow: "0 2px 8px rgba(44,44,42,0.15)",
         }} />
-        <div style={{
-          padding: "48px 20px 20px", height: "100%", boxSizing: "border-box",
-          display: "flex", flexDirection: "column", overflowY: "auto",
-        }}>
-          {renderScreen()}
+        <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+          <div style={{
+            padding: "48px 20px 20px", flex: 1, boxSizing: "border-box",
+            display: "flex", flexDirection: "column", overflowY: "auto",
+            paddingBottom: showBottomNav ? "8px" : "20px",
+          }}>
+            {renderScreen()}
+          </div>
+          {showBottomNav && (
+            <div style={{
+              display: "flex", justifyContent: "space-around", padding: "6px 0 22px",
+              borderTop: `1px solid ${colors.divider}`,
+              background: "rgba(240, 235, 225, 0.7)",
+              backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+              flexShrink: 0,
+            }}>
+              {navTabs.map((tab, i) => {
+                const isActive = screen === tab.target || (tab.target === screens.HOME && screen === screens.HOME);
+                return (
+                  <div key={i} onClick={() => {
+                    if (tab.target === screens.HOME) resetAll();
+                    else if (tab.target) navigate(tab.target);
+                  }} style={{
+                    display: "flex", flexDirection: "column", alignItems: "center", gap: "2px",
+                    cursor: tab.target ? "pointer" : "default", padding: "4px 12px",
+                    opacity: tab.target ? 1 : 0.4,
+                  }}>
+                    {renderIcon(tab.icon, 20, isActive ? colors.text : colors.textTertiary)}
+                    <span style={{
+                      fontSize: "10px", fontWeight: 600, fontFamily: fonts.caption,
+                      color: isActive ? colors.text : colors.textTertiary,
+                    }}>{tab.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
