@@ -1,0 +1,14 @@
+{
+  "indexes": [
+    {
+      "//": "useMyOrders(): where donorUid == uid, ordered by createdAt desc.",
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "donorUid", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

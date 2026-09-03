@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amelior8 Ops</title>
+<!--
+  Internal ops console. Stands in for the GR8 facilitator app until it exists.
+
+  Deliberately unstyled — this is not a product surface and gets no design
+  effort. It calls exactly the same /api/ops endpoints the GR8 app will call,
+  so nothing on the donor side changes when that app arrives.
+
+  Access needs BOTH a Firebase account with the `role: "ops"` custom claim and
+  the OPS_API_KEY. The key is typed in per session and kept in memory only.
+-->
+<style>
+  body { font: 14px/1.5 system-ui, sans-serif; margin: 24px; max-width: 1100px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 16px; }
+  th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; font-size: 13px; }
+  th { background: #eee; }
+  button { padding: 4px 8px; margin-right: 4px; cursor: pointer; }
+  input, select { padding: 5px; margin-right: 6px; }
+  .bar { margin-bottom: 12px; }
+  .msg { padding: 8px; margin: 12px 0; border: 1px solid #999; background: #f6f6f6; white-space: pre-wrap; font-family: monospace; font-size: 12px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<h1>Amelior8 Ops</h1>
+
+<div id="signin">
+  <p>Sign in with an ops account.</p>
+  <div class="bar">
+    <input id="email" type="email" placeholder="email" size="28">
+    <input id="password" type="password" placeholder="password" size="20">
+    <input id="opskey" type="password" placeholder="OPS_API_KEY" size="28">
+    <button onclick="signIn()">Sign in</button>
+  </div>
+</div>
+
+<div id="console" class="hidden">
+  <div class="bar">
+    <select id="filter" onchange="load()">
+      <option value="">All orders</option>
+      <option value="FUNDED">FUNDED — needs a GR8</option>
+      <option value="ASSIGNED">ASSIGNED — awaiting purchase</option>
+      <option value="PURCHASED">PURCHASED — awaiting delivery</option>
+      <option value="DELIVERED">DELIVERED — check verification</option>
+      <option value="VERIFIED">VERIFIED</option>
+      <option value="PROOF_REJECTED">PROOF_REJECTED</option>
+      <option value="ON_HOLD">ON_HOLD</option>
+    </select>
+    <button onclick="load()">Refresh</button>
+    <span id="who"></span>
+    <button onclick="signOutOps()">Sign out</button>
+  </div>
+  <div id="msg" class="msg hidden"></div>
+  <table id="table"></table>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const app = initializeApp({
+  apiKey: "AIzaSyB8r_o3Vgxnu6ClOZ52RVoTnP7OyVAL37s",
+  authDomain: "amelior8it.firebaseapp.com",
+  projectId: "amelior8it",
+  storageBucket: "amelior8it.firebasestorage.app",
+});
+const auth = getAuth(app);
+let opsKey = null;
+
+function show(text) {
+  const el = document.getElementById("msg");
+  el.textContent = typeof text === "string" ? text : JSON.stringify(text, null, 2);
+  el.classList.remove("hidden");
+}
+
+async function call(path, options = {}) {
+  const token = await auth.currentUser.getIdToken();
+  const res = await fetch(`/api${path}`, {
+    method: options.method || "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "X-Ops-Key": opsKey,
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data;
+}
+
+window.signIn = async () => {
+  try {
+    opsKey = document.getElementById("opskey").value;
+    await signInWithEmailAndPassword(
+      auth,
+      document.getElementById("email").value,
+      document.getElementById("password").value,
+    );
+    document.getElementById("signin").classList.add("hidden");
+    document.getElementById("console").classList.remove("hidden");
+    document.getElementById("who").textContent = auth.currentUser.email + " ";
+    load();
+  } catch (err) {
+    show("Sign-in failed: " + err.message);
+  }
+};
+
+window.signOutOps = async () => {
+  opsKey = null;
+  await signOut(auth);
+  location.reload();
+};
+
+window.load = async () => {
+  try {
+    const status = document.getElementById("filter").value;
+    const { orders } = await call(`/ops/orders${status ? `?status=${status}` : ""}`);
+    render(orders);
+    document.getElementById("msg").classList.add("hidden");
+  } catch (err) {
+    show("Could not load orders: " + err.message);
+  }
+};
+
+function render(orders) {
+  const rows = orders.map((o) => `
+    <tr>
+      <td>${o.id}</td>
+      <td>${o.status}</td>
+      <td>${o.item || ""}<br><small>${o.partner || ""} · ${o.country || ""}</small></td>
+      <td>${o.facilitator || "--"}</td>
+      <td>${o.verification}</td>
+      <td>
+        ${o.status === "FUNDED" ? `<button onclick="assign('${o.id}')">Assign GR8</button>` : ""}
+        ${o.status === "ASSIGNED" ? `<button onclick="advance('${o.id}','PURCHASED')">Mark bought</button>` : ""}
+        ${o.status === "PURCHASED" || o.status === "PROOF_REJECTED" ? `<button onclick="uploadProof('${o.id}')">Upload proof</button>` : ""}
+        ${o.status === "DELIVERED" ? `<button onclick="review('${o.id}','approve')">Approve</button><button onclick="review('${o.id}','reject')">Reject</button>` : ""}
+        <button onclick="advance('${o.id}','ON_HOLD')">Hold</button>
+        <button onclick="advance('${o.id}','CANCELLED')">Cancel</button>
+      </td>
+    </tr>`).join("");
+
+  document.getElementById("table").innerHTML = `
+    <tr><th>Order</th><th>Status</th><th>Gift</th><th>GR8</th><th>Proof</th><th>Actions</th></tr>
+    ${rows || "<tr><td colspan=6>No orders.</td></tr>"}`;
+}
+
+window.assign = async (id) => {
+  const facilitatorId = prompt("Facilitator id (document id in the facilitators collection):");
+  if (!facilitatorId) return;
+  try {
+    show(await call(`/ops/orders/${id}/assign`, { method: "POST", body: { facilitatorId } }));
+    load();
+  } catch (err) { show("Assign failed: " + err.message); }
+};
+
+window.advance = async (id, toStatus) => {
+  const note = prompt(`Note for moving ${id} to ${toStatus} (optional):`) || null;
+  try {
+    show(await call(`/ops/orders/${id}/advance`, { method: "POST", body: { toStatus, note } }));
+    load();
+  } catch (err) { show("Advance failed: " + err.message); }
+};
+
+// Three steps: get a signed URL, PUT the bytes, then tell the server it landed.
+// The server confirms the object exists before moving the order to DELIVERED.
+window.uploadProof = async (id) => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/jpeg,image/png,image/webp";
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+    try {
+      show("Requesting upload URL...");
+      const { uploadUrl, path } = await call(`/ops/orders/${id}/proof-upload-url`, {
+        method: "POST", body: { contentType: file.type },
+      });
+
+      show("Uploading photo...");
+      const put = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      if (!put.ok) throw new Error(`Upload failed (${put.status})`);
+
+      show("Uploaded. Running verification...");
+      show(await call(`/ops/orders/${id}/proof-upload-url`, {
+        method: "POST", body: { path, complete: true },
+      }));
+      load();
+    } catch (err) { show("Proof upload failed: " + err.message); }
+  };
+  input.click();
+};
+
+window.review = async (id, decision) => {
+  const reason = prompt(`Reason for ${decision} (optional):`) || null;
+  try {
+    show(await call(`/ops/proofs/${id}/review`, { method: "POST", body: { decision, reason } }));
+    load();
+  } catch (err) { show("Review failed: " + err.message); }
+};
+</script>
+</body>
+</html>

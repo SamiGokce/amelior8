@@ -44,7 +44,9 @@ try {
   await page.screenshot({ path: homePath, fullPage: false });
   console.log(`Screenshot saved: ${homePath}`);
 
-  // Navigate to country screen by clicking through the UI
+  // Navigate through the giving flow. Catalog screens need seeded Firestore
+  // data; without it they render their empty state, which is still worth
+  // capturing.
   // Use XPath text selectors for reliable clicks
   const clickText = async (text) => {
     const [el] = await page.$$(`xpath/.//div[contains(text(),"${text}")]`);
@@ -58,7 +60,7 @@ try {
     return false;
   };
 
-  await clickText('Make a Donation');
+  await clickText('Choose a gift') || await clickText('Give again');
 
   const causePath = `${SCREENSHOTS_DIR}/app-cause-${timestamp}.png`;
   await page.screenshot({ path: causePath, fullPage: false });

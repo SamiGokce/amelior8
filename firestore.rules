@@ -1,0 +1,94 @@
+rules_version = '2';
+
+// Deny by default. The client reads its own data and writes almost nothing —
+// every business write goes through /api with the Admin SDK, which bypasses
+// these rules entirely.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // ---- Catalog: public read, never client-written --------------------
+    match /giftItems/{itemId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /partners/{partnerId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /countries/{countryCode} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // ---- Donor profile: own document, profile fields only --------------
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+
+      // Creating your own record on first sign-in.
+      allow create: if isOwner(uid)
+        && request.resource.data.uid == uid
+        && !request.resource.data.keys().hasAny([
+          'totalGiven', 'giftCount', 'stripeCustomerId'
+        ]);
+
+      // Money and Stripe identifiers are server-maintained — a donor must not
+      // be able to inflate their own totals or attach someone else's customer.
+      allow update: if isOwner(uid)
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['displayName', 'photoURL', 'phone', 'lastSeenAt']);
+
+      allow delete: if false;
+    }
+
+    // ---- Orders: read your own, write none ----------------------------
+    match /orders/{orderId} {
+      allow read: if signedIn() && resource.data.donorUid == request.auth.uid;
+      allow write: if false;
+
+      // Audit trail and email log are server-only.
+      match /events/{eventId} {
+        allow read, write: if false;
+      }
+      match /emails/{emailId} {
+        allow read, write: if false;
+      }
+    }
+
+    // ---- Server-only collections --------------------------------------
+    match /facilitators/{facilitatorId} {
+      allow read, write: if false;
+    }
+
+    match /subscriptions/{subscriptionId} {
+      allow read, write: if false;
+    }
+
+    match /payouts/{payoutId} {
+      allow read, write: if false;
+    }
+
+    match /webhookEvents/{eventId} {
+      allow read, write: if false;
+    }
+
+    // Prototype data from before the rebuild. Not read, not written.
+    match /donors/{donorId} {
+      allow read, write: if false;
+    }
+
+    // Anything not named above.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
