@@ -62,10 +62,11 @@ export function useGiftItems() {
 /** Categories are derived from what's actually in the catalog, so an empty
  *  category never renders as a dead end. */
 export const CATEGORY_META = {
-  water: { label: "Water", icon: "droplet" },
-  education: { label: "Education", icon: "book" },
-  health: { label: "Health", icon: "heart" },
-  food: { label: "Food", icon: "wheat" },
+  education: { label: "Education", icon: "book", color: "#7B5CD6" },
+  clothing: { label: "Clothing", icon: "shirt", color: "#3FA46A" },
+  food: { label: "Food", icon: "wheat", color: "#CC5602" },
+  water: { label: "Clean Water", icon: "droplet", color: "#3B93E0" },
+  health: { label: "Medical", icon: "medical", color: "#E0433B" },
 };
 
 export function useCategories() {
@@ -75,6 +76,20 @@ export function useCategories() {
     .filter(([key]) => present.has(key))
     .map(([key, meta]) => ({ key, ...meta }));
   return { categories, loading, error };
+}
+
+/** Free-text search across name, description, category and country. */
+export function searchItems(items, query, countries = []) {
+  const q = query.trim().toLowerCase();
+  if (!q) return items;
+  const countryName = (code) =>
+    countries.find((c) => c.code === code)?.name?.toLowerCase() || "";
+  return items.filter((item) => [
+    item.name,
+    item.description,
+    CATEGORY_META[item.category]?.label,
+    countryName(item.countryCode),
+  ].filter(Boolean).some((field) => field.toLowerCase().includes(q)));
 }
 
 export function useGiftItem(itemId) {

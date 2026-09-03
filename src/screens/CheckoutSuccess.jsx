@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useOrder } from "../hooks/useOrder";
 import { STATUS } from "../../shared/orderStatus";
-import { colors, fonts, glass } from "../theme";
+import { colors, fonts, surfaces } from "../theme";
 import { Icon } from "../icons";
 import { Btn } from "../components/Btn";
 import { ErrorState, Loading } from "../components/States";
@@ -54,7 +54,7 @@ export default function CheckoutSuccess() {
       <div style={{ display: "flex", flexDirection: "column", height: "100%", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
         <Loading label="Confirming your payment" />
         {waitedSeconds > 12 && (
-          <div style={{ ...glass.panelLight, padding: "12px", margin: "0 0 12px" }}>
+          <div style={{ ...surfaces.cardFlat, padding: "12px", margin: "0 0 12px" }}>
             <p style={{ fontSize: "12px", color: colors.textSecondary, margin: 0, lineHeight: 1.5, fontFamily: fonts.body }}>
               This is taking longer than usual. Your payment is safe — the confirmation
               just has not reached us yet. You can close this page; we will email you

@@ -21,7 +21,7 @@ export default withErrors(async (req, res) => {
   }
 
   const orderId = req.query.id;
-  const { contentType = "image/jpeg", path, complete } = readJsonBody(req);
+  const { contentType = "image/jpeg", path, complete, recipientMessage } = readJsonBody(req);
 
   const order = await getOrder(orderId);
   if (order.facilitatorId !== user.facilitatorId) {
@@ -31,7 +31,7 @@ export default withErrors(async (req, res) => {
   const actor = { kind: "facilitator", id: user.facilitatorId || user.uid };
 
   if (complete) {
-    const updated = await completeProof(orderId, path, actor);
+    const updated = await completeProof(orderId, path, actor, { recipientMessage });
     const verification = await verifyProof(orderId);
     return json(res, 200, { orderId, status: updated.status, verification });
   }

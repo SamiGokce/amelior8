@@ -57,10 +57,18 @@ const ITEMS = [
   { itemId: "mosquito-nets", name: "Two treated mosquito nets", description: "Long-lasting insecticide-treated bed nets covering a family sleeping area.", category: "health", priceUsdCents: 1600, facilitatorFeeUsdCents: 600, platformFeeUsdCents: 250, partnerId: "rural-health-ke", countryCode: "KE", estimatedDeliveryDays: 5 },
   { itemId: "first-aid-kit", name: "Household first aid kit", description: "Basic wound care, antiseptic, and rehydration salts for a rural household.", category: "health", priceUsdCents: 2900, facilitatorFeeUsdCents: 700, platformFeeUsdCents: 350, partnerId: "medaid-ug", countryCode: "UG", estimatedDeliveryDays: 7 },
   { itemId: "food-parcel-month", name: "One month of food staples", description: "Maize flour, beans, rice, cooking oil and salt for a family of four for a month.", category: "food", priceUsdCents: 4200, facilitatorFeeUsdCents: 800, platformFeeUsdCents: 500, partnerId: "harvest-hope", countryCode: "TZ", estimatedDeliveryDays: 6 },
+  { itemId: "school-uniform", name: "A school uniform", description: "Shirt, trousers or skirt, and shoes so a child can attend school without being turned away.", category: "clothing", priceUsdCents: 2400, facilitatorFeeUsdCents: 650, platformFeeUsdCents: 320, partnerId: "bright-futures", countryCode: "UG", estimatedDeliveryDays: 8 },
+  { itemId: "warm-blankets", name: "Two warm blankets", description: "Heavy blankets for a household through the cold season.", category: "clothing", priceUsdCents: 2000, facilitatorFeeUsdCents: 600, platformFeeUsdCents: 280, partnerId: "harvest-hope", countryCode: "TZ", estimatedDeliveryDays: 6 },
   { itemId: "school-meals-term", name: "A term of school meals", description: "One hot meal a day for one child for a full school term.", category: "food", priceUsdCents: 3500, facilitatorFeeUsdCents: 700, platformFeeUsdCents: 420, partnerId: "feed-the-future", countryCode: "NG", estimatedDeliveryDays: 9 },
 ];
 
 function db() {
+  // Against the emulator no credentials are needed or wanted.
+  if (process.env.FIRESTORE_EMULATOR_HOST) {
+    initializeApp({ projectId: process.env.GCLOUD_PROJECT || "amelior8it" });
+    return getFirestore();
+  }
+
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
   if (!raw) {
     console.error("FIREBASE_SERVICE_ACCOUNT_JSON is not set.");

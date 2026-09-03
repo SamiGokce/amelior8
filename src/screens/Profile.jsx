@@ -4,9 +4,8 @@ import { useAuth } from "../hooks/useAuth";
 import { useMyOrders, useMySubscriptions } from "../hooks/useOrder";
 import { api } from "../lib/api";
 import { formatUsd } from "../lib/format";
-import { colors, fonts, glass } from "../theme";
+import { colors, fonts, surfaces } from "../theme";
 import { Icon } from "../icons";
-import { Header } from "../components/Header";
 import { Btn } from "../components/Btn";
 import { Loading } from "../components/States";
 
@@ -38,10 +37,13 @@ export default function Profile() {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <Header title="Profile" onBack={() => navigate("/")} />
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100%" }}>
+      <h1 style={{
+        fontFamily: fonts.display, fontSize: "27px", fontWeight: 700, color: colors.text,
+        margin: "6px 0 18px", letterSpacing: "-0.045em",
+      }}>Account</h1>
 
-      <div style={{ ...glass.panel, padding: "16px", marginBottom: "10px", display: "flex", alignItems: "center", gap: "12px" }}>
+      <div style={{ ...surfaces.card, padding: "16px", marginBottom: "10px", display: "flex", alignItems: "center", gap: "12px" }}>
         <div style={{
           width: "44px", height: "44px", borderRadius: "50%", flexShrink: 0,
           background: colors.accentLight, display: "flex", alignItems: "center", justifyContent: "center",
@@ -60,7 +62,7 @@ export default function Profile() {
       {!user?.emailVerified && (
         <div
           onClick={() => navigate("/verify-email")}
-          style={{ ...glass.panelAccent, padding: "12px", marginBottom: "10px", cursor: "pointer" }}
+          style={{ ...surfaces.accent, padding: "12px", marginBottom: "10px", cursor: "pointer" }}
         >
           <p style={{ fontSize: "12px", fontWeight: 700, color: colors.accent, margin: "0 0 2px", fontFamily: fonts.ui }}>
             Verify your email
@@ -76,8 +78,8 @@ export default function Profile() {
           { label: "Given", value: formatUsd(totalGiven) },
           { label: "Gifts", value: String(orders.filter((o) => o.paymentStatus === "succeeded").length) },
         ].map((stat) => (
-          <div key={stat.label} style={{ ...glass.panelLight, padding: "12px", flex: 1, textAlign: "center" }}>
-            <p style={{ fontSize: "18px", fontWeight: 700, color: colors.accent, margin: "0 0 2px", fontFamily: fonts.ui, letterSpacing: "-0.02em" }}>
+          <div key={stat.label} style={{ ...surfaces.card, padding: "13px", flex: 1, textAlign: "center" }}>
+            <p style={{ fontSize: "18px", fontWeight: 700, color: colors.text, margin: "0 0 2px", fontFamily: fonts.ui, letterSpacing: "-0.03em" }}>
               {stat.value}
             </p>
             <p style={{ fontSize: "10px", color: colors.textSecondary, margin: 0, fontFamily: fonts.caption, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 600 }}>
@@ -87,7 +89,7 @@ export default function Profile() {
         ))}
       </div>
 
-      <div style={{ ...glass.panel, padding: "14px", marginBottom: "10px" }}>
+      <div style={{ ...surfaces.card, padding: "14px", marginBottom: "10px" }}>
         <p style={{ fontSize: "11px", fontWeight: 600, color: colors.textSecondary, margin: "0 0 10px", textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: fonts.caption }}>
           Monthly gifts
         </p>

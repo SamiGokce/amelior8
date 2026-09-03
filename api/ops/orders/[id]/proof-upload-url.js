@@ -18,11 +18,11 @@ export default withErrors(async (req, res) => {
   const ops = await requireOps(req);
 
   const orderId = req.query.id;
-  const { contentType = "image/jpeg", path, complete } = readJsonBody(req);
+  const { contentType = "image/jpeg", path, complete, recipientMessage } = readJsonBody(req);
   const actor = { kind: "ops", id: ops.uid };
 
   if (complete) {
-    const order = await completeProof(orderId, path, actor);
+    const order = await completeProof(orderId, path, actor, { recipientMessage });
     // Verification runs inline: a donor should not see a bare "delivered" with
     // an unresolved badge for any longer than necessary.
     const result = await verifyProof(orderId);

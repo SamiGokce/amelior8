@@ -30,8 +30,9 @@ try {
   const page = await browser.newPage();
 
   // Phone-sized viewport to capture the app frame
-  await page.setViewport({ width: 1200, height: 900, deviceScaleFactor: 2 });
-  await page.goto(URL, { waitUntil: 'networkidle0' });
+  await page.setViewport({ width: 1100, height: 950, deviceScaleFactor: 2 });
+  await page.goto(URL, { waitUntil: 'domcontentloaded' });
+  await new Promise((r) => setTimeout(r, 2500));
 
   // Wait for fonts to load
   await page.evaluate(() => document.fonts.ready);

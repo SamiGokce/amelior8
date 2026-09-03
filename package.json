@@ -10,7 +10,10 @@
     "screenshot": "node scripts/screenshot.mjs",
     "test": "vitest run",
     "test:rules": "firebase emulators:exec --only firestore \"vitest run --config vitest.rules.config.js\"",
-    "seed": "node scripts/seed-catalog.mjs"
+    "seed": "node scripts/seed-catalog.mjs",
+    "emulator": "firebase emulators:start --only firestore,auth --project amelior8it",
+    "seed:emulator": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 GCLOUD_PROJECT=amelior8it node scripts/seed-catalog.mjs --force",
+    "dev:emulator": "VITE_USE_EMULATOR=1 vite"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.123.0",
@@ -26,6 +29,7 @@
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.2",
     "@vitejs/plugin-react": "^4.3.4",
+    "firebase-tools": "^15.29.0",
     "puppeteer": "^24.39.1",
     "vite": "^6.0.0",
     "vitest": "^4.1.11"

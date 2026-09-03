@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { authErrorMessage, useAuth } from "../hooks/useAuth";
-import { colors, fonts, glass } from "../theme";
+import { colors, fonts, surfaces } from "../theme";
 import { Icon } from "../icons";
 import { Btn } from "../components/Btn";
 import { InputField } from "../components/InputField";
@@ -54,7 +54,7 @@ export default function ForgotPassword() {
       <InputField label="Email" value={email} onChange={setEmail} placeholder="you@example.com" type="email" />
 
       {error && (
-        <div style={{ ...glass.panelAccent, padding: "10px 12px", marginBottom: "12px" }}>
+        <div style={{ ...surfaces.accent, padding: "10px 12px", marginBottom: "12px" }}>
           <p style={{ fontSize: "12px", color: colors.accent, margin: 0, fontWeight: 600, fontFamily: fonts.ui }}>{error}</p>
         </div>
       )}

@@ -192,9 +192,11 @@ window.uploadProof = async (id) => {
       });
       if (!put.ok) throw new Error(`Upload failed (${put.status})`);
 
+      const recipientMessage = prompt("Anything the recipient said? (optional, shown to the donor)") || null;
+
       show("Uploaded. Running verification...");
       show(await call(`/ops/orders/${id}/proof-upload-url`, {
-        method: "POST", body: { path, complete: true },
+        method: "POST", body: { path, complete: true, recipientMessage },
       }));
       load();
     } catch (err) { show("Proof upload failed: " + err.message); }

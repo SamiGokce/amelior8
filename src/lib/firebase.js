@@ -6,7 +6,8 @@
 
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
+import { connectAuthEmulator } from "firebase/auth";
 
 const config = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyB8r_o3Vgxnu6ClOZ52RVoTnP7OyVAL37s",
@@ -20,3 +21,10 @@ const config = {
 export const app = getApps().length ? getApp() : initializeApp(config);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// Local development against the Firebase emulators. Never on in production —
+// the flag is build-time and absent from any deployed environment.
+if (import.meta.env.VITE_USE_EMULATOR === "1") {
+  connectFirestoreEmulator(db, "127.0.0.1", 8080);
+  connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+}

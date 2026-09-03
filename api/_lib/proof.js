@@ -55,7 +55,7 @@ export async function createProofUploadUrl(orderId, contentType, actor) {
  * We confirm the object really exists before believing it — otherwise anyone
  * with an upload URL could mark a gift delivered without uploading anything.
  */
-export async function completeProof(orderId, path, actor) {
+export async function completeProof(orderId, path, actor, { recipientMessage = null } = {}) {
   const order = await getOrder(orderId);
 
   if (!path || path !== order.pendingProofPath) {
@@ -69,6 +69,10 @@ export async function completeProof(orderId, path, actor) {
 
   const patch = {
     proofPhotoPath: path,
+    // Optional, captured by the facilitator at handover. The donor's tracking
+    // page renders the quote block only when this is actually present — never
+    // a stand-in.
+    ...(recipientMessage ? { recipientMessage: String(recipientMessage).slice(0, 500) } : {}),
     pendingProofPath: FieldValue.delete(),
     verification: {
       state: "pending",

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { colors, fonts, glass } from "../theme";
+import { colors, fonts, surfaces } from "../theme";
 import { Icon } from "../icons";
 import { Btn } from "../components/Btn";
 
@@ -47,7 +47,7 @@ export default function VerifyEmail() {
       </p>
 
       {resent && (
-        <div style={{ ...glass.panelSuccess, padding: "10px 12px", marginBottom: "12px", width: "100%", boxSizing: "border-box" }}>
+        <div style={{ ...surfaces.success, padding: "10px 12px", marginBottom: "12px", width: "100%", boxSizing: "border-box" }}>
           <p style={{ fontSize: "12px", color: colors.successText, margin: 0, fontWeight: 600, fontFamily: fonts.ui }}>Sent again — give it a minute.</p>
         </div>
       )}

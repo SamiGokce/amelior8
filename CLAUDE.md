@@ -17,7 +17,7 @@ a four-stage order state machine, and AI-verified delivery photos.
 - **Email**: Resend
 - **Verification**: Claude vision (`claude-sonnet-5`) via the Anthropic SDK
 - **Deploy**: Vercel (auto-deploys from `main`)
-- **Styling**: Inline styles — liquid glass design system
+- **Styling**: Inline styles — light card design system (see Brand & Design)
 
 ## Structure
 
@@ -25,9 +25,10 @@ a four-stage order state machine, and AI-verified delivery photos.
 shared/orderStatus.js     # order lifecycle — imported by BOTH client and api
 src/
   App.jsx                 # router + auth gate + phone shell
-  theme.js                # glass, colors, fonts
+  theme.js                # colors, fonts, surfaces, radius, shadow
   icons.jsx               # the Icon object
-  components/             # Btn, InputField, Header, QRCode, CountryBadge, States
+  components/             # Btn, Chip, SearchField, Catalog, Brand, Header, States
+  DesignPreview.jsx       # dev-only reference screens, stripped from prod
   screens/                # one file per screen
   hooks/                  # useAuth, useCatalog, useOrder
   lib/                    # firebase.js, api.js, format.js
@@ -51,6 +52,8 @@ tests/
 - `npm test` — state machine unit tests
 - `npm run test:rules` — security rules tests (needs the Firestore emulator)
 - `npm run seed` — seed the catalog (needs `FIREBASE_SERVICE_ACCOUNT_JSON`)
+- `npm run emulator` / `seed:emulator` / `dev:emulator` — local Firebase
+  emulator workflow (needs Java installed)
 - `npm run screenshot` — build, launch, capture a 2x retina screenshot
 
 ## Workflow
@@ -86,8 +89,14 @@ These protect real money and real donor data. Do not work around them.
 
 - No emojis anywhere in the UI — use inline SVG icons via the `Icon` object
 - All styling is inline React styles, no CSS files
-- Design tokens live in `src/theme.js` (`glass`, `colors`, `fonts`)
-- Liquid glass aesthetic layered on the brand palette
+- Design tokens live in `src/theme.js` (`colors`, `fonts`, `surfaces`, `radius`, `shadow`)
+- Light card system: white cards on a near-white ground, soft shadows,
+  Charcoal pill CTAs with a trailing arrow. Burnt Orange is the accent, not the
+  CTA colour — this follows the approved mockups and diverges from BRAND.md's
+  "Burnt Orange for primary actions" and Cloud Dancer backgrounds. Typography,
+  the wordmark and the palette itself are unchanged.
+- `npm run dev` then `/preview` renders the three reference screens with sample
+  data. It is dev-only and tree-shaken out of production builds.
 
 ### Key brand colors
 - Burnt Orange `#CC5602` — logo, headlines, CTAs

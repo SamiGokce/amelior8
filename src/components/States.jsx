@@ -1,4 +1,4 @@
-import { colors, fonts, glass } from "../theme";
+import { colors, fonts, surfaces } from "../theme";
 import { Icon } from "../icons";
 import { Btn } from "./Btn";
 
@@ -41,7 +41,7 @@ export function ErrorState({ title = "Something went wrong", message, onRetry, r
           lineHeight: 1.5, fontFamily: fonts.body,
         }}>{message}</p>
       )}
-      {onRetry && <Btn onClick={onRetry} style={{ width: "100%" }}>{retryLabel}</Btn>}
+      {onRetry && <Btn onClick={onRetry} arrow={false} style={{ width: "100%" }}>{retryLabel}</Btn>}
     </div>
   );
 }
@@ -49,7 +49,7 @@ export function ErrorState({ title = "Something went wrong", message, onRetry, r
 export function EmptyState({ icon = "gift", title, message, action, onAction }) {
   return (
     <div style={{
-      ...glass.panelLight, padding: "28px 20px", textAlign: "center", marginTop: "8px",
+      ...surfaces.card, padding: "28px 20px", textAlign: "center", marginTop: "8px",
     }}>
       <div style={{
         width: "48px", height: "48px", borderRadius: "50%",
@@ -66,7 +66,7 @@ export function EmptyState({ icon = "gift", title, message, action, onAction }) 
           lineHeight: 1.5, fontFamily: fonts.body,
         }}>{message}</p>
       )}
-      {action && onAction && <Btn onClick={onAction} style={{ width: "100%" }}>{action}</Btn>}
+      {action && onAction && <Btn onClick={onAction} arrow={false} style={{ width: "100%" }}>{action}</Btn>}
     </div>
   );
 }
