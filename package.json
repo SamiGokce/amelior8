@@ -24,6 +24,7 @@
     "react-router-dom": "^7.18.3",
     "react-world-flags": "^1.6.0",
     "resend": "^6.26.0",
+    "sharp": "^0.35.4",
     "stripe": "^22.6.1"
   },
   "devDependencies": {

@@ -31,4 +31,8 @@ export const orgApi = {
   invite: (email, role) => request("/org/invites", { method: "POST", body: { email, role } }),
 
   acceptInvite: (token) => request("/invites/accept", { method: "POST", body: { token } }),
+
+  stripeStatus: () => request("/org/stripe"),
+  startStripeOnboarding: () => request("/org/stripe", { method: "POST" }),
+  payouts: () => request("/org/payouts"),
 };

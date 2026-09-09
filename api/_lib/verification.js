@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { FieldValue, adminBucket, adminDb } from "./admin.js";
 import { STATUS } from "../../shared/orderStatus.js";
 import { recordEvent } from "./orderState.js";
+import { blurEntire, blurRegions } from "./images.js";
 
 const MODEL = "claude-sonnet-5";
 
@@ -35,8 +36,33 @@ const VERDICT_TOOL = {
         items: { type: "string" },
         description: "Short, specific observations supporting the verdict.",
       },
+      faces: {
+        type: "array",
+        description:
+          "Bounding box for EVERY human face visible, however small, partial or " +
+          "turned away. Coordinates are fractions of the image: x and y are the " +
+          "top-left corner, width and height the size, all between 0 and 1. " +
+          "Return an empty array only if you are certain no face is present.",
+        items: {
+          type: "object",
+          properties: {
+            x: { type: "number" },
+            y: { type: "number" },
+            width: { type: "number" },
+            height: { type: "number" },
+          },
+          required: ["x", "y", "width", "height"],
+        },
+      },
+      facesCertain: {
+        type: "boolean",
+        description:
+          "True only if you are confident you located every face. False if the " +
+          "image is unclear, crowded, or you are unsure — the whole photo will " +
+          "then be blurred instead.",
+      },
     },
-    required: ["verdict", "score", "showsOrderedItem", "showsHandover", "reasons"],
+    required: ["verdict", "score", "showsOrderedItem", "showsHandover", "reasons", "faces", "facesCertain"],
   },
 };
 
@@ -54,6 +80,11 @@ Assess the attached photo:
 1. Does it plausibly show the item that was ordered?
 2. Does it show a handover, or the item in a recipient's possession?
 3. Is anything visibly inconsistent with the stated country?
+4. Locate every human face, so it can be blurred before the donor sees it.
+
+On faces: err heavily toward finding them. A missed face means a recipient's
+identity reaches a stranger. If you are not confident you found them all, say
+so with facesCertain=false and the whole image will be blurred instead.
 
 A real donor sees the result of this check, and a real relay's payment
 depends on it. Do not pass a photo you are unsure about — use "flag" and let a
@@ -119,6 +150,8 @@ export async function verifyProof(orderId) {
       },
       updatedAt: FieldValue.serverTimestamp(),
     });
+    // Face positions are unknown, so the donor gets the safe version.
+    await generateDonorView(orderId, order.proofPhotoPath, buffer, null);
     return { state: "pending", reason: "not_configured" };
   }
 
@@ -156,6 +189,7 @@ export async function verifyProof(orderId) {
     await recordEvent(orderId, "verification_error", { kind: "system", id: "verification" }, {
       error: err.message,
     });
+    await generateDonorView(orderId, order.proofPhotoPath, buffer, null);
     return { state: "pending", reason: "call_failed" };
   }
 
@@ -198,5 +232,72 @@ export async function verifyProof(orderId) {
     verdict, score: result.score ?? null, reasons, reusedFrom,
   });
 
+  // Safeguarding derivative, generated before any donor can request the photo.
+  await generateDonorView(orderId, order.proofPhotoPath, buffer, result);
+
   return { state: aiState, verdict, reasons, score: result.score ?? null, reusedFrom };
+}
+
+/**
+ * Produces the blurred copy the donor is served.
+ *
+ * Default closed at every branch: unknown face positions, an unusable result,
+ * or a thrown error all end in a fully blurred image rather than a sharp one.
+ */
+async function generateDonorView(orderId, originalPath, buffer, aiResult) {
+  const orderRef = adminDb().collection("orders").doc(orderId);
+  const blurredPath = originalPath.replace(/(\.[a-z]+)$/i, "") + "-donor.jpg";
+
+  let output = null;
+  let method = "full";
+
+  try {
+    const faces = Array.isArray(aiResult?.faces) ? aiResult.faces : [];
+    const usable = faces.filter((f) =>
+      [f.x, f.y, f.width, f.height].every((n) => typeof n === "number" && n >= 0 && n <= 1)
+      && f.width > 0 && f.height > 0);
+
+    if (aiResult?.facesCertain === true && usable.length > 0) {
+      output = await blurRegions(buffer, usable);
+      method = "faces";
+    } else if (aiResult?.facesCertain === true && faces.length === 0) {
+      // Confident there is nobody in frame: the photo can be shown as taken.
+      output = buffer;
+      method = "none";
+    }
+
+    if (!output) {
+      output = await blurEntire(buffer);
+      method = "full";
+    }
+  } catch (err) {
+    console.error(`Blur generation failed for ${orderId}:`, err);
+    try {
+      output = await blurEntire(buffer);
+      method = "full";
+    } catch {
+      // Cannot produce a safe derivative at all. The donor sees no photo.
+      await orderRef.update({
+        proofDonorPath: null,
+        proofBlur: { method: "unavailable", generatedAt: FieldValue.serverTimestamp() },
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+      return;
+    }
+  }
+
+  await adminBucket().file(blurredPath).save(output, {
+    contentType: "image/jpeg",
+    metadata: { cacheControl: "private, max-age=0" },
+  });
+
+  await orderRef.update({
+    proofDonorPath: blurredPath,
+    proofBlur: {
+      method,                       // "faces" | "full" | "none"
+      faceCount: method === "faces" ? aiResult.faces.length : 0,
+      generatedAt: FieldValue.serverTimestamp(),
+    },
+    updatedAt: FieldValue.serverTimestamp(),
+  });
 }

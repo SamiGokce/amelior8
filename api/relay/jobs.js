@@ -35,9 +35,10 @@ export default withErrors(async (req, res) => {
       itemDescription: o.itemSnapshot?.description || null,
       category: o.itemSnapshot?.category || null,
       quantity: o.quantity || 1,
-      // What they may spend, and what they earn for the delivery.
+      // What they may spend on the gift. No amount is owed to a relay by
+      // Amelior8 — their organisation compensates them directly.
       budgetUsdCents: o.giftAmount,
-      earningUsdCents: o.relayFee,
+      generatedForOrgUsdCents: o.partnerFeeShare || 0,
       recipient: o.recipient || null,
       country: o.countrySnapshot?.name || o.countryCode,
       partner: o.partnerSnapshot?.name || null,
@@ -71,8 +72,9 @@ export default withErrors(async (req, res) => {
       openCount: open.length,
       awaitingReviewCount: awaitingReview.length,
       completedCount: done.length,
-      // Accrued, not payable. No payout rail is wired yet and the app says so.
-      earnedUsdCents: done.reduce((sum, o) => sum + (o.earningUsdCents || 0), 0),
+      // Display only: what this relay's completed work has generated for their
+      // organisation. Amelior8 owes a relay nothing directly.
+      generatedForOrgUsdCents: done.reduce((sum, o) => sum + (o.generatedForOrgUsdCents || 0), 0),
     },
   });
 });

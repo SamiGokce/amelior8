@@ -38,33 +38,49 @@ function ProofBadge({ verification }) {
 }
 
 function ProofPhoto({ orderId, rounded = radius.xl }) {
-  const [url, setUrl] = useState(null);
+  const [res, setRes] = useState(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let alive = true;
     api.getProofUrl(orderId)
-      .then((res) => { if (alive) setUrl(res.url); })
+      .then((r) => { if (alive) setRes(r); })
       .catch(() => { if (alive) setFailed(true); });
     return () => { alive = false; };
   }, [orderId]);
 
-  if (url) {
+  if (res?.url) {
     return (
-      <img src={url} alt="Delivery of your gift" style={{
-        width: "100%", borderRadius: rounded, display: "block",
-        aspectRatio: "4/3", objectFit: "cover",
-      }} />
+      <>
+        <img src={res.url} alt="Delivery of your gift" style={{
+          width: "100%", borderRadius: rounded, display: "block",
+          aspectRatio: "4/3", objectFit: "cover",
+        }} />
+        {/* The donor should understand the blur is deliberate, not a bad photo. */}
+        {res.blur && res.blur !== "none" && (
+          <p style={{
+            fontSize: "11.5px", color: colors.textTertiary, margin: "9px 2px 0",
+            lineHeight: 1.5, fontFamily: fonts.ui,
+          }}>
+            {res.blur === "faces"
+              ? "Faces are blurred to protect the person who received your gift."
+              : "This photo is blurred to protect the person who received your gift."}
+          </p>
+        )}
+      </>
     );
   }
+
   return (
     <div style={{
       width: "100%", aspectRatio: "4/3", borderRadius: rounded,
-      background: colors.surfaceSunken,
-      display: "flex", alignItems: "center", justifyContent: "center",
+      background: colors.surfaceSunken, padding: "20px", boxSizing: "border-box",
+      display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center",
     }}>
-      <p style={{ fontSize: "12px", color: colors.textTertiary, margin: 0, fontFamily: fonts.ui }}>
-        {failed ? "Photo could not be loaded" : "Loading photo"}
+      <p style={{ fontSize: "12.5px", color: colors.textTertiary, margin: 0, fontFamily: fonts.ui, lineHeight: 1.5 }}>
+        {failed ? "Photo could not be loaded"
+          : res?.pending ? "The delivery photo is still being prepared."
+          : "Loading photo"}
       </p>
     </div>
   );

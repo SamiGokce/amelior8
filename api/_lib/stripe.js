@@ -11,21 +11,3 @@ export function stripe() {
 }
 
 export const isLiveMode = () => (process.env.STRIPE_SECRET_KEY || "").startsWith("sk_live");
-
-/**
- * The one place a gift's price is decided. Reads from the stored item, never
- * from anything the client sent.
- */
-export function priceBreakdown(item, quantity = 1) {
-  const q = Math.max(1, Math.min(10, Math.floor(quantity) || 1));
-  const giftAmount = item.priceUsdCents * q;
-  const relayFee = item.relayFeeUsdCents * q;
-  const platformFee = item.platformFeeUsdCents * q;
-  return {
-    quantity: q,
-    giftAmount,
-    relayFee,
-    platformFee,
-    totalCharged: giftAmount + relayFee + platformFee,
-  };
-}

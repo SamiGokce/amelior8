@@ -5,8 +5,14 @@
       "collectionGroup": "orders",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "donorUid", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
+        {
+          "fieldPath": "donorUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
       ]
     },
     {
@@ -14,8 +20,14 @@
       "collectionGroup": "orders",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "partnerId", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" }
+        {
+          "fieldPath": "partnerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
       ]
     },
     {
@@ -23,8 +35,14 @@
       "collectionGroup": "orders",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "relayId", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" }
+        {
+          "fieldPath": "relayId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
       ]
     },
     {
@@ -32,8 +50,29 @@
       "collectionGroup": "relays",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "partnerId", "order": "ASCENDING" },
-        { "fieldPath": "active", "order": "ASCENDING" }
+        {
+          "fieldPath": "partnerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "active",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "//": "Monthly payout reconciliation: every partner's statement for a period.",
+      "collectionGroup": "payouts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "partnerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "period",
+          "order": "DESCENDING"
+        }
       ]
     }
   ],

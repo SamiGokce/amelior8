@@ -57,6 +57,9 @@ beforeEach(async () => {
       uid: "orgadmin", partnerId: "maji-safi", role: "org_admin", active: true,
     });
     await setDoc(doc(db, "orgInvites/sometoken"), { partnerId: "maji-safi", email: "x@y.z" });
+    await setDoc(doc(db, "payouts/maji-safi_2026-09"), {
+      partnerId: "maji-safi", period: "2026-09", amountUsdCents: 1000, status: "draft",
+    });
     await setDoc(doc(db, "giftItems/water-filter-family"), {
       name: "Family water filter",
       priceUsdCents: 3200,
@@ -229,5 +232,25 @@ describe("donor cannot reach org or relay data", () => {
 
   it("keeps org membership hidden from a donor", async () => {
     await assertFails(getDoc(doc(asAlice(), "orgUsers/orgadmin")));
+  });
+});
+
+describe("payouts", () => {
+  it("lets an org read its own statement", async () => {
+    await assertSucceeds(getDoc(doc(asOrg(), "payouts/maji-safi_2026-09")));
+  });
+
+  it("stops an org reading another org's statement", async () => {
+    await assertFails(getDoc(doc(asOtherOrg(), "payouts/maji-safi_2026-09")));
+  });
+
+  it("stops an org writing a statement", async () => {
+    await assertFails(updateDoc(doc(asOrg(), "payouts/maji-safi_2026-09"), { status: "paid" }));
+    await assertFails(updateDoc(doc(asOrg(), "payouts/maji-safi_2026-09"), { amountUsdCents: 999999 }));
+  });
+
+  it("keeps statements away from donors and relays", async () => {
+    await assertFails(getDoc(doc(asAlice(), "payouts/maji-safi_2026-09")));
+    await assertFails(getDoc(doc(asRelay(), "payouts/maji-safi_2026-09")));
   });
 });

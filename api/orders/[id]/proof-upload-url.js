@@ -21,7 +21,9 @@ export default withErrors(async (req, res) => {
   }
 
   const orderId = req.query.id;
-  const { contentType = "image/jpeg", path, complete, recipientMessage } = readJsonBody(req);
+  const {
+    contentType = "image/jpeg", path, complete, recipientMessage, recipientConsent,
+  } = readJsonBody(req);
 
   const order = await getOrder(orderId);
   if (order.relayId !== user.relayId) {
@@ -31,7 +33,7 @@ export default withErrors(async (req, res) => {
   const actor = { kind: "relay", id: user.relayId || user.uid };
 
   if (complete) {
-    const updated = await completeProof(orderId, path, actor, { recipientMessage });
+    const updated = await completeProof(orderId, path, actor, { recipientMessage, recipientConsent });
     const verification = await verifyProof(orderId);
     return json(res, 200, { orderId, status: updated.status, verification });
   }

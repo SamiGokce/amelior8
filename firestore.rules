@@ -127,8 +127,11 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // An org may read its own monthly statements. Building and settling them
+    // is Admin-SDK only.
     match /payouts/{payoutId} {
-      allow read, write: if false;
+      allow read: if isOps() || isOrgOf(resource.data.partnerId);
+      allow write: if false;
     }
 
     match /webhookEvents/{eventId} {

@@ -35,6 +35,8 @@ export default withErrors(async (req, res) => {
       recipient: order.recipient || null,
       relay: order.relaySnapshot?.name || null,
       recipientMessage: order.recipientMessage || null,
+      recipientConsent: order.recipientConsent || null,
+      proofBlur: order.proofBlur || null,
       purchase: order.purchase
         ? {
             amountPaidUsdCents: order.purchase.amountPaidUsdCents,

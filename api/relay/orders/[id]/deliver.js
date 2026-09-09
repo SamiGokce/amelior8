@@ -23,13 +23,15 @@ export default withErrors(async (req, res) => {
   const order = await getOrder(orderId);
   assertOrderAssignedToRelay(order, relay.relayId);
 
-  const { contentType = "image/jpeg", path, complete, recipientMessage } = readJsonBody(req);
+  const {
+    contentType = "image/jpeg", path, complete, recipientMessage, recipientConsent,
+  } = readJsonBody(req);
 
   if (!complete) {
     return json(res, 200, await createProofUploadUrl(orderId, contentType));
   }
 
-  await completeProof(orderId, path, relay.actor, { recipientMessage });
+  await completeProof(orderId, path, relay.actor, { recipientMessage, recipientConsent });
 
   // Best-effort: a failed check must not lose a delivery the relay has already
   // made. verifyProof records its own error state and the org reviews anyway.

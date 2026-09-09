@@ -4,6 +4,7 @@ import { useGiftItem, usePartners, CATEGORY_META } from "../hooks/useCatalog";
 import { useAuth } from "../hooks/useAuth";
 import { api } from "../lib/api";
 import { formatDeliveryWindow, formatUsd } from "../lib/format";
+import { VERIFICATION_FEE_USD_CENTS, priceBreakdown } from "../../shared/fees";
 import { colors, fonts, radius, surfaces } from "../theme";
 import { Icon, renderIcon } from "../icons";
 import { Header } from "../components/Header";
@@ -57,9 +58,13 @@ export default function GiftDetail() {
   }
 
   const partner = partners.find((p) => p.partnerId === item.partnerId || p.id === item.partnerId);
-  const unit = item.priceUsdCents + item.relayFeeUsdCents + item.platformFeeUsdCents;
-  const total = unit * quantity;
   const meta = CATEGORY_META[item.category] || {};
+
+  // The same function the server uses to price the order, so the donor is
+  // never quoted a number the server then disagrees with.
+  const price = priceBreakdown(item, quantity);
+  const unit = item.priceUsdCents;
+  const total = price.totalCharged;
 
   async function give() {
     if (!user) return navigate("/signin", { state: { from: `/gift/${itemId}` } });
@@ -116,7 +121,7 @@ export default function GiftDetail() {
       <div style={{ display: "flex", gap: "8px", marginBottom: "20px" }}>
         <InfoTile
           icon="heart" iconColor={colors.accent} iconBg={colors.accentLight}
-          value={formatUsd(unit)} label="Donation"
+          value={formatUsd(unit)} label="Gift"
         />
         <InfoTile
           icon="user" iconColor={colors.textSecondary} iconBg="rgba(107, 107, 82, 0.12)"
@@ -155,6 +160,40 @@ export default function GiftDetail() {
         <Chip selected={monthly} onClick={() => setMonthly(true)} style={{ flex: 1 }}>Monthly</Chip>
       </div>
 
+      {/* Two lines, deliberately. The gift and the fee are never blended into
+          a single number — a donor should always see exactly what reaches the
+          partner and what pays for the verification. */}
+      <div style={{ ...surfaces.card, padding: "14px", marginBottom: "10px" }}>
+        {[
+          { label: quantity > 1 ? `Your gift (x${quantity})` : "Your gift", value: price.giftAmount },
+          { label: "Verified delivery", value: price.verificationFee },
+        ].map((row) => (
+          <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0" }}>
+            <span style={{ fontSize: "13px", color: colors.textSecondary, fontFamily: fonts.ui }}>{row.label}</span>
+            <span style={{ fontSize: "13px", fontWeight: 600, color: colors.text, fontFamily: fonts.ui }}>
+              {formatUsd(row.value)}
+            </span>
+          </div>
+        ))}
+        <div style={{
+          display: "flex", justifyContent: "space-between", padding: "9px 0 0",
+          marginTop: "5px", borderTop: `1px solid ${colors.divider}`,
+        }}>
+          <span style={{ fontSize: "13.5px", fontWeight: 700, color: colors.text, fontFamily: fonts.ui }}>Total</span>
+          <span style={{ fontSize: "13.5px", fontWeight: 700, color: colors.text, fontFamily: fonts.ui }}>
+            {formatUsd(total)}{monthly ? " / month" : ""}
+          </span>
+        </div>
+        <p style={{
+          fontSize: "11px", color: colors.textTertiary, margin: "9px 0 0",
+          lineHeight: 1.5, fontFamily: fonts.ui,
+        }}>
+          Every cent of your gift goes to {partner?.name || "the partner organisation"}.
+          The delivery fee pays the relay who buys and hands it over, and the check
+          that verifies it happened.
+        </p>
+      </div>
+
       <div style={{ ...surfaces.tile, padding: "13px", marginBottom: "8px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "5px" }}>
           {Icon.shield(14, colors.dustyTeal)}
@@ -163,9 +202,9 @@ export default function GiftDetail() {
           </span>
         </div>
         <p style={{ fontSize: "11.5px", color: colors.textSecondary, margin: 0, lineHeight: 1.5, fontFamily: fonts.body }}>
-          {quantity > 1 ? `${quantity} x ${formatUsd(unit)}. ` : ""}
-          Funds go to {partner?.name || "the partner organisation"}
-          {partner?.location ? ` in ${partner.location}` : ""}. {formatDeliveryWindow(item.estimatedDeliveryDays)}.
+          {partner?.name || "The partner organisation"}
+          {partner?.location ? ` in ${partner.location}` : ""} sources and delivers this gift.
+          {" "}{formatDeliveryWindow(item.estimatedDeliveryDays)}.
         </p>
       </div>
 

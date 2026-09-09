@@ -7,6 +7,7 @@ import Queue from "./screens/Queue";
 import Review from "./screens/Review";
 import Relays from "./screens/Relays";
 import Team from "./screens/Team";
+import Payments from "./screens/Payments";
 
 // Dev-only. Vite drops this branch from a production build.
 const preview = import.meta.env.DEV
@@ -19,6 +20,7 @@ if (preview) {
 const NAV = [
   { key: "queue", label: "Gifts" },
   { key: "relays", label: "Relays" },
+  { key: "payments", label: "Payments" },
   { key: "team", label: "Team" },
 ];
 
@@ -85,7 +87,8 @@ function Portal() {
           />
         ) : tab === "queue" ? (
           <Queue onReview={setReviewing} />
-        ) : tab === "relays" ? <Relays /> : <Team />}
+        ) : tab === "relays" ? <Relays />
+          : tab === "payments" ? <Payments /> : <Team />}
       </main>
     </div>
   );

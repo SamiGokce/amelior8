@@ -53,6 +53,7 @@ export default function Job({ job, queued, onBack, onChanged }) {
   const [photo, setPhoto] = useState(null);
   const [amount, setAmount] = useState("");
   const [message, setMessage] = useState("");
+  const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [queuedNow, setQueuedNow] = useState(false);
@@ -68,7 +69,10 @@ export default function Job({ job, queued, onBack, onChanged }) {
     const cents = Math.round(parseFloat(amount) * 100);
     const payload = buying
       ? { kind: "purchase", orderId: job.id, blob: photo.blob, contentType: photo.contentType, amountPaidUsdCents: cents }
-      : { kind: "deliver", orderId: job.id, blob: photo.blob, contentType: photo.contentType, recipientMessage: message.trim() || null };
+      : {
+          kind: "deliver", orderId: job.id, blob: photo.blob, contentType: photo.contentType,
+          recipientMessage: message.trim() || null, recipientConsent: consent,
+        };
 
     try {
       if (buying) {
@@ -77,7 +81,10 @@ export default function Job({ job, queued, onBack, onChanged }) {
         });
       } else {
         await relayApi.submitDelivery(job.id, {
-          blob: photo.blob, contentType: photo.contentType, recipientMessage: message.trim() || null,
+          blob: photo.blob,
+          contentType: photo.contentType,
+          recipientMessage: message.trim() || null,
+          recipientConsent: consent,
         });
       }
       onChanged();
@@ -130,7 +137,6 @@ export default function Job({ job, queued, onBack, onChanged }) {
         {[
           ["For", job.recipient?.firstName ? `${job.recipient.firstName}${job.recipient.area ? `, ${job.recipient.area}` : ""}` : "--"],
           ["You can spend up to", money(job.budgetUsdCents)],
-          ["You earn", money(job.earningUsdCents)],
           job.quantity > 1 ? ["How many", String(job.quantity)] : null,
         ].filter(Boolean).map(([k, v]) => (
           <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0" }}>
@@ -209,10 +215,41 @@ export default function Job({ job, queued, onBack, onChanged }) {
         <>
           <PhotoInput
             label="Photo of the handover"
-            hint="Show the gift with the person receiving it. This is what the donor sees."
+            hint="Show the gift with the person receiving it. Faces are blurred before the donor sees it."
             value={photo}
             onChange={setPhoto}
           />
+
+          {/* Consent is its own deliberate act. A photo existing is not
+              agreement to be photographed, and the server refuses the
+              submission without this. */}
+          <div
+            onClick={() => setConsent((v) => !v)}
+            style={{
+              display: "flex", gap: "12px", alignItems: "flex-start", cursor: "pointer",
+              background: consent ? "rgba(90, 138, 100, 0.10)" : colors.surface,
+              border: `1px solid ${consent ? "rgba(90, 138, 100, 0.35)" : colors.border}`,
+              borderRadius: radius.md, padding: "15px", marginBottom: "18px",
+            }}
+          >
+            <div style={{
+              width: "24px", height: "24px", borderRadius: "7px", flexShrink: 0, marginTop: "1px",
+              background: consent ? "#3D6B47" : colors.surfaceMuted,
+              border: consent ? "none" : `1px solid ${colors.border}`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              {consent && Icon.check(15, "#FFFFFF")}
+            </div>
+            <div>
+              <p style={{ fontSize: "14.5px", fontWeight: 700, color: colors.text, margin: "0 0 3px", lineHeight: 1.35 }}>
+                They agreed to be photographed
+              </p>
+              <p style={{ fontSize: "12.5px", color: colors.textSecondary, margin: 0, lineHeight: 1.5 }}>
+                Ask first. If they would rather not be in the photo, photograph
+                the gift on its own — that is fine.
+              </p>
+            </div>
+          </div>
 
           <p style={{
             fontSize: "11px", fontWeight: 700, color: colors.textTertiary,
@@ -232,9 +269,15 @@ export default function Job({ job, queued, onBack, onChanged }) {
             }}
           />
 
-          <Big onClick={submit} disabled={busy || !photo}>
+          <Big onClick={submit} disabled={busy || !photo || !consent}>
             {busy ? "Sending..." : "I delivered it"}
           </Big>
+          {photo && !consent && (
+            <p style={{
+              fontSize: "12.5px", color: colors.textSecondary, margin: "-2px 0 0",
+              textAlign: "center", lineHeight: 1.5,
+            }}>Confirm they agreed to the photo before sending.</p>
+          )}
         </>
       )}
     </div>

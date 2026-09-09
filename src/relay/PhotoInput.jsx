@@ -6,23 +6,26 @@ const MAX_EDGE = 1600;
 const QUALITY = 0.82;
 
 /**
- * Shrinks a phone photo before it goes anywhere.
+ * Shrinks a phone photo and strips its metadata before it goes anywhere.
  *
- * A modern camera produces 4-8MB per shot. On the connections relays actually
- * work on, uploading that is the difference between a job finishing and a job
- * failing — and it is the relay's own data being spent. 1600px is plenty for
- * verification, by eye or by model.
+ * Two jobs in one pass:
  *
- * If anything about the resize fails, the original is used rather than losing
- * the photo.
+ *  - Size. A modern camera produces 4-8MB per shot. On the connections relays
+ *    actually work on, uploading that is the difference between a job
+ *    finishing and one failing, on the relay's own data. 1600px is plenty for
+ *    verification, by eye or by model.
+ *
+ *  - Location. Drawing to a canvas and re-encoding discards every EXIF block,
+ *    GPS included. This happens on every photo without exception — a small
+ *    file is not a safe file, and the previous shortcut of passing small
+ *    originals through kept their coordinates intact.
+ *
+ * The server strips metadata again on receipt. This is the first of the two.
  */
 export async function compressImage(file) {
   try {
     const bitmap = await createImageBitmap(file);
     const scale = Math.min(1, MAX_EDGE / Math.max(bitmap.width, bitmap.height));
-    if (scale === 1 && file.size < 1_200_000) {
-      return { blob: file, contentType: file.type || "image/jpeg" };
-    }
 
     const canvas = document.createElement("canvas");
     canvas.width = Math.round(bitmap.width * scale);
@@ -33,10 +36,13 @@ export async function compressImage(file) {
     const blob = await new Promise((resolve) =>
       canvas.toBlob(resolve, "image/jpeg", QUALITY),
     );
-    if (!blob) return { blob: file, contentType: file.type || "image/jpeg" };
-    return { blob, contentType: "image/jpeg" };
-  } catch {
-    return { blob: file, contentType: file.type || "image/jpeg" };
+    // A failed re-encode means metadata may survive, so refuse rather than
+    // upload something we have not sanitised.
+    if (!blob) throw new Error("Could not process the photo");
+    return { blob, contentType: "image/jpeg", sanitised: true };
+  } catch (err) {
+    console.error("Photo processing failed:", err);
+    return { error: "This photo could not be prepared. Try taking it again." };
   }
 }
 
@@ -46,13 +52,21 @@ export function PhotoInput({ label, hint, value, onChange }) {
   const [preview, setPreview] = useState(null);
   const [working, setWorking] = useState(false);
 
+  const [failed, setFailed] = useState(null);
+
   async function pick(e) {
     const file = e.target.files?.[0];
     if (!file) return;
     setWorking(true);
-    const compressed = await compressImage(file);
-    setPreview(URL.createObjectURL(compressed.blob));
-    onChange(compressed);
+    setFailed(null);
+    const result = await compressImage(file);
+    if (result.error) {
+      setFailed(result.error);
+      onChange(null);
+    } else {
+      setPreview(URL.createObjectURL(result.blob));
+      onChange(result);
+    }
     setWorking(false);
   }
 
@@ -104,6 +118,13 @@ export function PhotoInput({ label, hint, value, onChange }) {
             margin: "9px 0 0", fontFamily: fonts.ui, cursor: "pointer",
           }}
         >Take a different photo</p>
+      )}
+
+      {failed && (
+        <p style={{
+          fontSize: "12.5px", color: "#B03028", margin: "8px 0 0",
+          lineHeight: 1.5, fontFamily: fonts.ui, fontWeight: 600,
+        }}>{failed}</p>
       )}
 
       {hint && (

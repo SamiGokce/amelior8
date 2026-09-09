@@ -68,7 +68,7 @@ export default function Home() {
                     lines={[countryName(item.countryCode)]}
                     right={
                       <span style={{ fontSize: "13px", fontWeight: 700, color: colors.text, fontFamily: fonts.ui }}>
-                        {formatUsd(item.priceUsdCents + item.relayFeeUsdCents + item.platformFeeUsdCents)}
+                        {formatUsd(item.priceUsdCents)}
                       </span>
                     }
                     onClick={() => navigate(`/gift/${item.id}`)}

@@ -4,6 +4,7 @@ import { reserveOrderId } from "../_lib/ids.js";
 import { stripe } from "../_lib/stripe.js";
 import { transitionOrder } from "../_lib/orderState.js";
 import { sendOrderEmail } from "../_lib/email.js";
+import { syncAccountStatus } from "../_lib/connect.js";
 import { STATUS } from "../../shared/orderStatus.js";
 
 // Stripe signs the raw bytes — Vercel's JSON parser would invalidate them.
@@ -186,6 +187,21 @@ async function onChargeRefunded(charge) {
   if (changed) await sendOrderEmail(STATUS.REFUNDED, { ...order, ...updated, id: orderId });
 }
 
+/**
+ * A partner's Connect account changed. This is what flips onboardingComplete,
+ * and it can also flip it back — Stripe disables accounts when requirements
+ * fall due, and a partner who cannot receive money must stop taking gifts.
+ */
+async function onAccountUpdated(account) {
+  const partnerId = account.metadata?.partnerId;
+  if (!partnerId) {
+    console.warn(`account.updated for ${account.id} with no partnerId in metadata`);
+    return;
+  }
+  const { onboardingComplete } = await syncAccountStatus(partnerId, account);
+  console.log(`Connect account for ${partnerId}: onboardingComplete=${onboardingComplete}`);
+}
+
 async function onSubscriptionDeleted(subscription) {
   await adminDb().collection("subscriptions").doc(subscription.id).set({
     status: "cancelled",
@@ -196,18 +212,31 @@ async function onSubscriptionDeleted(subscription) {
 export default withErrors(async (req, res) => {
   if (!methodGuard(req, res, "POST")) return;
 
-  const secret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!secret) {
-    console.error("STRIPE_WEBHOOK_SECRET is not set — refusing to trust this request.");
+  // Connect events are delivered to a separate endpoint in Stripe, which gets
+  // its own signing secret. Both are accepted here so one handler serves both.
+  const secrets = [
+    process.env.STRIPE_WEBHOOK_SECRET,
+    process.env.STRIPE_CONNECT_WEBHOOK_SECRET,
+  ].filter(Boolean);
+
+  if (secrets.length === 0) {
+    console.error("No Stripe webhook secret is set — refusing to trust this request.");
     return json(res, 503, { error: "Webhook not configured.", code: "not_configured" });
   }
 
   const body = await rawBody(req);
-  let event;
-  try {
-    event = stripe().webhooks.constructEvent(body, req.headers["stripe-signature"], secret);
-  } catch (err) {
-    console.error("Stripe signature verification failed:", err.message);
+  const signature = req.headers["stripe-signature"];
+  let event = null;
+  for (const secret of secrets) {
+    try {
+      event = stripe().webhooks.constructEvent(body, signature, secret);
+      break;
+    } catch {
+      // Try the next secret before giving up.
+    }
+  }
+  if (!event) {
+    console.error("Stripe signature verification failed against every configured secret.");
     return json(res, 400, { error: "Invalid signature.", code: "bad_signature" });
   }
 
@@ -222,6 +251,7 @@ export default withErrors(async (req, res) => {
       case "payment_intent.payment_failed": await onPaymentFailed(event.data.object); break;
       case "charge.refunded": await onChargeRefunded(event.data.object); break;
       case "customer.subscription.deleted": await onSubscriptionDeleted(event.data.object); break;
+      case "account.updated": await onAccountUpdated(event.data.object); break;
       default: console.log(`Unhandled Stripe event ${event.type}`);
     }
   } catch (err) {

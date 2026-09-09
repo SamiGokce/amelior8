@@ -19,13 +19,13 @@ export const relayApi = {
     });
   },
 
-  async submitDelivery(orderId, { blob, contentType, recipientMessage }) {
+  async submitDelivery(orderId, { blob, contentType, recipientMessage, recipientConsent }) {
     const { uploadUrl, path } = await request(`/relay/orders/${orderId}/deliver`, {
       method: "POST", body: { contentType },
     });
     await uploadToSignedUrl(uploadUrl, blob, contentType);
     return request(`/relay/orders/${orderId}/deliver`, {
-      method: "POST", body: { path, complete: true, recipientMessage },
+      method: "POST", body: { path, complete: true, recipientMessage, recipientConsent },
     });
   },
 };
@@ -43,5 +43,8 @@ export function sendQueuedItem(item) {
     blob: item.blob,
     contentType: item.contentType,
     recipientMessage: item.recipientMessage,
+    // Carried through the offline queue — consent was given at capture time,
+    // and the server still requires it when the queued item finally sends.
+    recipientConsent: item.recipientConsent,
   });
 }

@@ -16,7 +16,7 @@ const ORDERS = [
   {
     id: "A8-7K3M9Q", status: "FUNDED", item: "One month of food staples",
     itemDescription: "Maize flour, beans, rice, cooking oil and salt for a family of four.",
-    category: "food", quantity: 1, giftAmount: 4200, relayFee: 800,
+    category: "food", quantity: 1, giftAmount: 4200, verificationFee: 500,
     country: "Tanzania", relayId: null, relay: null, recipient: null,
     purchase: null, verification: null, hasProof: false,
     stageTimestamps: { funded: ago(180) }, createdAt: ago(190),
@@ -24,7 +24,7 @@ const ORDERS = [
   {
     id: "A8-2XB4YT", status: "FUNDED", item: "Family water filter",
     itemDescription: "A household ceramic filter for about two years of clean water.",
-    category: "water", quantity: 2, giftAmount: 6400, relayFee: 1400,
+    category: "water", quantity: 2, giftAmount: 6400, verificationFee: 500,
     country: "Kenya", relayId: null, relay: null, recipient: null,
     purchase: null, verification: null, hasProof: false,
     stageTimestamps: { funded: ago(45) }, createdAt: ago(50),
@@ -32,7 +32,7 @@ const ORDERS = [
   {
     id: "A8-9PLM3D", status: "PURCHASED", item: "School supply kit",
     itemDescription: "Books, pens and a backpack for one pupil for a term.",
-    category: "education", quantity: 1, giftAmount: 2200, relayFee: 600,
+    category: "education", quantity: 1, giftAmount: 2200, verificationFee: 500,
     country: "Uganda", relayId: "rel_1", relay: "James Mwangi",
     recipient: { firstName: "Joseph", area: "Kisumu" },
     purchase: { amountPaidUsdCents: 2350, overBudget: true, varianceUsdCents: 150, submittedAt: ago(120) },
@@ -43,7 +43,7 @@ const ORDERS = [
   {
     id: "A8-5RT8KW", status: "DELIVERED", item: "Two treated mosquito nets",
     itemDescription: "Long-lasting treated bed nets for a family sleeping area.",
-    category: "health", quantity: 1, giftAmount: 1600, relayFee: 600,
+    category: "health", quantity: 1, giftAmount: 1600, verificationFee: 500,
     country: "Kenya", relayId: "rel_2", relay: "Amina Otieno",
     recipient: { firstName: "Grace", area: "Mombasa" },
     purchase: { amountPaidUsdCents: 1550, overBudget: false, varianceUsdCents: -50, submittedAt: ago(300) },
@@ -94,7 +94,7 @@ const RELAY_JOBS = {
     {
       id: "A8-9PLM3D", status: "ASSIGNED", item: "School supply kit",
       itemDescription: "Books, pens and a backpack for one pupil for a term.",
-      category: "education", quantity: 1, budgetUsdCents: 2200, earningUsdCents: 600,
+      category: "education", quantity: 1, budgetUsdCents: 2200, generatedForOrgUsdCents: 250,
       recipient: { firstName: "Joseph", area: "Kisumu" }, country: "Uganda",
       partner: "Bright Futures Academy", purchase: null, verification: "none",
       rejectionNote: null, assignedAt: ago(1440), deliveredAt: null,
@@ -102,7 +102,7 @@ const RELAY_JOBS = {
     {
       id: "A8-3QW7ZP", status: "PURCHASED", item: "One month of food staples",
       itemDescription: "Maize flour, beans, rice, cooking oil and salt for a family of four.",
-      category: "food", quantity: 1, budgetUsdCents: 4200, earningUsdCents: 800,
+      category: "food", quantity: 1, budgetUsdCents: 4200, generatedForOrgUsdCents: 250,
       recipient: { firstName: "Miriam", area: "Kisumu" }, country: "Kenya",
       partner: "Maji Safi Initiative",
       purchase: { amountPaidUsdCents: 4100, submittedAt: ago(90) },
@@ -111,7 +111,7 @@ const RELAY_JOBS = {
     {
       id: "A8-8HJ2NM", status: "PROOF_REJECTED", item: "Family water filter",
       itemDescription: "A household ceramic filter for about two years of clean water.",
-      category: "water", quantity: 1, budgetUsdCents: 3200, earningUsdCents: 700,
+      category: "water", quantity: 1, budgetUsdCents: 3200, generatedForOrgUsdCents: 250,
       recipient: { firstName: "Daniel", area: "Nairobi" }, country: "Kenya",
       partner: "Clean Wells Project",
       purchase: { amountPaidUsdCents: 3200, submittedAt: ago(2000) },
@@ -124,7 +124,7 @@ const RELAY_JOBS = {
     {
       id: "A8-5RT8KW", status: "DELIVERED", item: "Two treated mosquito nets",
       itemDescription: "Long-lasting treated bed nets for a family sleeping area.",
-      category: "health", quantity: 1, budgetUsdCents: 1600, earningUsdCents: 600,
+      category: "health", quantity: 1, budgetUsdCents: 1600, generatedForOrgUsdCents: 250,
       recipient: { firstName: "Grace", area: "Mombasa" }, country: "Kenya",
       partner: "Rural Health Kenya",
       purchase: { amountPaidUsdCents: 1550, submittedAt: ago(300) },
@@ -133,7 +133,7 @@ const RELAY_JOBS = {
     },
   ],
   done: [],
-  summary: { openCount: 3, awaitingReviewCount: 1, completedCount: 17, earnedUsdCents: 11200 },
+  summary: { openCount: 3, awaitingReviewCount: 1, completedCount: 17, generatedForOrgUsdCents: 4250 },
 };
 
 const ROUTES = [
@@ -178,6 +178,23 @@ const ROUTES = [
     org: { partnerId: "maji-safi", name: "Maji Safi Initiative", location: "Kisumu" },
   })],
   [/^\/relay\/jobs$/, () => RELAY_JOBS],
+  [/^\/org\/stripe$/, () => ({
+    stripe: {
+      hasAccount: true, onboardingComplete: true,
+      detailsSubmitted: true, chargesEnabled: true, payoutsEnabled: true,
+      currentlyDue: [], disabledReason: null,
+    },
+  })],
+  [/^\/org\/payouts$/, () => ({
+    payouts: [
+      { payoutId: "maji-safi_2026-08", period: "2026-08", amountUsdCents: 3250,
+        giftTotalUsdCents: 41800, deliveryCount: 13, status: "paid",
+        lineItems: [], builtAt: ago(40000), paidAt: ago(20000) },
+      { payoutId: "maji-safi_2026-09", period: "2026-09", amountUsdCents: 1000,
+        giftTotalUsdCents: 12600, deliveryCount: 4, status: "draft",
+        lineItems: [], builtAt: ago(60), paidAt: null },
+    ],
+  })],
 ];
 
 /** Returns true if preview mode is on for this page load. */

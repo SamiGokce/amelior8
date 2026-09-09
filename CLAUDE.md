@@ -13,7 +13,8 @@ a four-stage order state machine, and AI-verified delivery photos.
 - **Build**: Vite 6
 - **Server**: Vercel serverless functions in `api/`, `firebase-admin` + Stripe
 - **Data**: Firestore. **Storage**: Firebase Storage. **Auth**: Firebase Auth
-- **Payments**: Stripe Checkout (one-time + monthly), webhook-driven
+- **Payments**: Stripe Checkout with **Connect destination charges** — money
+  settles in the partner's own account; we take an application fee
 - **Email**: Resend
 - **Verification**: Claude vision (`claude-sonnet-5`) via the Anthropic SDK
 - **Deploy**: Vercel (auto-deploys from `main`)
@@ -25,6 +26,7 @@ a four-stage order state machine, and AI-verified delivery photos.
 shared/
   orderStatus.js          # order lifecycle — imported by client AND api
   roles.js                # who can do what; relay username/PIN identity
+  fees.js                 # the money model — the only place a price is computed
 src/
   theme.js  icons.jsx  components/  lib/     # shared by all three front ends
   App.jsx  screens/  hooks/                  # donor app          -> index.html
@@ -32,8 +34,8 @@ src/
   relay/   App.jsx api.js offline.js PhotoInput.jsx screens/  # relay -> relay.html
   DesignPreview.jsx       # dev-only reference screens, stripped from prod
 api/
-  _lib/                   # admin, auth, stripe, email, orderState, proof,
-                          # verification, review, invites
+  _lib/                   # admin, auth, stripe, connect, email, orderState,
+                          # proof, images, verification, review, invites, payouts
   checkout/  webhooks/  orders/  subscriptions/     # donor
   org/                    # org portal: queue, assign, review, relays, invites
   relay/                  # relay app: jobs, purchase, deliver
@@ -84,8 +86,24 @@ Local URLs: `/` donor, `/org` org portal, `/relay` relay app, `/ops.html` ops.
 These protect real money and real donor data. Do not work around them.
 
 - **All amounts are integer USD cents.** No floats.
-- **The server computes every price**, read from Firestore. Never trust a
-  client-supplied amount.
+- **The server computes every price** via `shared/fees.js`, read from Firestore.
+  Never trust a client-supplied amount.
+
+### The money model
+- A gift's `priceUsdCents` goes **100% to the partner**. Items carry no fees.
+- A **flat `verificationFeeUsdCents` ($5) is added per order**, never per item
+  and never multiplied by quantity.
+- It splits evenly: our half is Stripe's `application_fee_amount`, the
+  partner's half rides the destination transfer. Odd cents go to the partner.
+- **Checkout shows two lines, always** — "Your gift" and "Verified delivery".
+  Never collapse them into one number; this is a donor-trust requirement.
+- **Amelior8 never holds donor funds.** Charges are destination charges against
+  the partner's connected account.
+- **No order may be created against a partner without completed Connect
+  onboarding.** `assertCanReceiveFunds()` guards checkout.
+- **`payouts` are keyed by `partnerId`, never by relay.** No money is owed to
+  an individual relay by this system; their organisation pays them. The relay
+  app may show a relay what their work generated, as display only.
 - **All business writes go through `/api`** with the Admin SDK. The client
   never writes an order.
 - **One `transitionOrder()`.** Nothing writes `status` directly. Transitions
@@ -108,6 +126,19 @@ These protect real money and real donor data. Do not work around them.
   may call a gift a tax-deductible donation, and no tax receipts are issued.
 - **Never invent partner registration numbers** or other real-looking
   credentials. Leave them null.
+
+### Safeguarding (delivery capture must never ship without these)
+- **Consent is explicit.** `recipientConsent` is a recorded boolean confirmed by
+  the relay at capture. The server refuses a delivery without it. A photo
+  existing is never taken as agreement.
+- **Location data never survives upload.** The relay app re-encodes every photo
+  via canvas (dropping EXIF/GPS), and the server strips metadata again on
+  receipt. An image that cannot be stripped is deleted, not stored.
+- **Donors see a blurred derivative, never the original.** `proofDonorPath` is
+  generated after verification; faces are blurred from the vision call's
+  bounding boxes. If face positions are uncertain, the whole image is blurred.
+  If no derivative exists, the donor sees no photo — the unblurred original is
+  never a fallback. The org sees the original in review; ops for disputes.
 
 ## Brand & Design (MANDATORY)
 **Before writing ANY frontend code, read `BRAND.md` first. No exceptions.**

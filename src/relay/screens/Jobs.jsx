@@ -41,7 +41,7 @@ function JobCard({ job, queuedCount, onOpen }) {
           fontFamily: fonts.caption,
         }}>{action?.label || job.status}</span>
         <span style={{ fontSize: "12px", color: colors.textTertiary, fontFamily: fonts.ui }}>
-          Budget {money(job.budgetUsdCents)} · you earn {money(job.earningUsdCents)}
+          Budget {money(job.budgetUsdCents)}
         </span>
         {queuedCount > 0 && (
           <span style={{
@@ -105,19 +105,20 @@ export default function Jobs({ data, queueByOrder, onOpen }) {
             <span style={{ fontSize: "13.5px", fontWeight: 700, color: colors.text }}>{summary.completedCount}</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "13.5px", color: colors.textSecondary }}>Earned so far</span>
+            <span style={{ fontSize: "13.5px", color: colors.textSecondary }}>Raised for your organisation</span>
             <span style={{ fontSize: "13.5px", fontWeight: 700, color: colors.text }}>
-              {money(summary.earnedUsdCents)}
+              {money(summary.generatedForOrgUsdCents)}
             </span>
           </div>
-          {/* No payout rail is wired yet. Saying so is better than implying money
-              is on its way. */}
+          {/* Amelior8 pays organisations, not individuals. Saying so plainly
+              beats a number that looks like a balance owed. */}
           <p style={{
             fontSize: "11.5px", color: colors.textTertiary, margin: "10px 0 0",
             lineHeight: 1.5, fontFamily: fonts.ui,
           }}>
-            This is what you have earned. Payment is arranged by your organisation —
-            it is not paid through this app yet.
+            This is what your deliveries have brought in for {"your organisation"}.
+            It is not a balance owed to you — your organisation arranges your pay
+            directly.
           </p>
         </div>
       )}

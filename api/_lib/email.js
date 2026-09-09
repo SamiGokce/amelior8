@@ -38,16 +38,16 @@ function layout({ heading, body, cta, ctaUrl }) {
 <div style="font-family:Georgia,serif;font-size:15px;line-height:1.6;color:${C.charcoal};">${body}</div>
 ${cta ? `<p style="margin:28px 0 0;"><a href="${ctaUrl}" style="display:inline-block;background:${C.orange};color:${C.cloud};text-decoration:none;padding:13px 24px;border-radius:14px;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:700;">${cta}</a></p>` : ""}
 <p style="margin:32px 0 0;padding-top:20px;border-top:1px solid rgba(107,107,82,0.15);font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.5;color:${C.olive};">
-Amelior8 connects you with local partners who deliver your gift in person. Funds for this gift go to the partner organisation named above.
+Amelior8 connects you with local partners who deliver your gift in person. Your gift goes in full to the partner organisation named above; the delivery fee pays the relay who hands it over and the check that verifies it.
 </p>
 </td></tr></table></td></tr></table></body></html>`;
 }
 
 function receiptRows(order) {
+  // The same two lines the donor saw at checkout. Never blended.
   const rows = [
-    ["Gift", money(order.giftAmount)],
-    ["Delivery by a local relay", money(order.relayFee)],
-    ["Amelior8 platform fee", money(order.platformFee)],
+    ["Your gift", money(order.giftAmount)],
+    ["Verified delivery", money(order.verificationFee)],
   ];
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:${C.charcoal};">
 ${rows.map(([l, v]) => `<tr><td style="padding:6px 0;color:${C.olive};">${l}</td><td align="right" style="padding:6px 0;">${v}</td></tr>`).join("")}
