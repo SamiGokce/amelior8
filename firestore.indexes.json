@@ -1,12 +1,39 @@
 {
   "indexes": [
     {
-      "//": "useMyOrders(): where donorUid == uid, ordered by createdAt desc.",
+      "//": "Donor's own order history: where donorUid ==, ordered by createdAt desc.",
       "collectionGroup": "orders",
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "donorUid", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "//": "Org portal queue: where partnerId == and status == (or status in).",
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "partnerId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "//": "Relay roster: what each relay currently holds, and the relay app's own job list.",
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "relayId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "//": "Org relay roster listing.",
+      "collectionGroup": "relays",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "partnerId", "order": "ASCENDING" },
+        { "fieldPath": "active", "order": "ASCENDING" }
       ]
     }
   ],

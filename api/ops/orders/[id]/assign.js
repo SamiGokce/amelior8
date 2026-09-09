@@ -6,10 +6,10 @@ import { sendOrderEmail } from "../../../_lib/email.js";
 import { STATUS } from "../../../../shared/orderStatus.js";
 
 /**
- * Assigns a relay to a funded gift. FUNDED -> ASSIGNED.
+ * Ops backstop for assigning a relay. FUNDED -> ASSIGNED.
  *
- * The relay app will eventually do this itself (accepting a job); it calls the
- * same transitionOrder underneath, so no donor-side code changes when it does.
+ * The local org does this themselves in the org portal; this exists for
+ * support cases. Both call the same transitionOrder underneath.
  */
 export default withErrors(async (req, res) => {
   if (!methodGuard(req, res, "POST")) return;
@@ -27,11 +27,11 @@ export default withErrors(async (req, res) => {
   }
 
   const order = await getOrder(orderId);
-  if (relay.countryCode !== order.countryCode) {
+  if (relay.partnerId !== order.partnerId) {
     throw new HttpError(
       409,
-      `That relay works in ${relay.countryCode}, but this gift is for ${order.countryCode}.`,
-      "country_mismatch",
+      `${relay.name} belongs to a different organisation than this gift.`,
+      "partner_mismatch",
     );
   }
 

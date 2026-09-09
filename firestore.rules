@@ -1,8 +1,17 @@
 rules_version = '2';
 
-// Deny by default. The client reads its own data and writes almost nothing —
-// every business write goes through /api with the Admin SDK, which bypasses
-// these rules entirely.
+// Deny by default.
+//
+// Three kinds of client read here — a donor, org staff, and a relay — and none
+// of them writes business data. Every order, relay, receipt and review goes
+// through /api with the Admin SDK, which bypasses these rules entirely. What
+// is written below is only about what a browser or phone may READ.
+//
+// Roles come from Firebase Auth custom claims, which only the Admin SDK sets:
+//   ops    -> role == "ops"
+//   org    -> orgRole in ["org_admin","org_staff"] and partnerId
+//   relay  -> role == "relay" and relayId, partnerId
+//   donor  -> no claims
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -10,8 +19,26 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function claims() {
+      return request.auth.token;
+    }
+
     function isOwner(uid) {
       return signedIn() && request.auth.uid == uid;
+    }
+
+    function isOps() {
+      return signedIn() && claims().role == 'ops';
+    }
+
+    function isOrgOf(partnerId) {
+      return signedIn()
+        && claims().partnerId == partnerId
+        && (claims().orgRole == 'org_admin' || claims().orgRole == 'org_staff');
+    }
+
+    function isRelay() {
+      return signedIn() && claims().role == 'relay';
     }
 
     // ---- Catalog: public read, never client-written --------------------
@@ -34,7 +61,6 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if isOwner(uid);
 
-      // Creating your own record on first sign-in.
       allow create: if isOwner(uid)
         && request.resource.data.uid == uid
         && !request.resource.data.keys().hasAny([
@@ -50,12 +76,18 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // ---- Orders: read your own, write none ----------------------------
+    // ---- Orders --------------------------------------------------------
+    // Read by the donor who paid, by the org fulfilling it, by the relay
+    // carrying it, or by ops. Written by nobody.
     match /orders/{orderId} {
-      allow read: if signedIn() && resource.data.donorUid == request.auth.uid;
+      allow read: if isOps()
+        || (signedIn() && resource.data.donorUid == request.auth.uid)
+        || isOrgOf(resource.data.partnerId)
+        || (isRelay() && resource.data.relayId == claims().relayId);
+
       allow write: if false;
 
-      // Audit trail and email log are server-only.
+      // Audit trail and email log stay server-only for everyone.
       match /events/{eventId} {
         allow read, write: if false;
       }
@@ -64,8 +96,30 @@ service cloud.firestore {
       }
     }
 
-    // ---- Server-only collections --------------------------------------
+    // ---- Relays --------------------------------------------------------
+    // An org may read its own roster; a relay may read their own record.
+    // Creation, PIN changes and deactivation are all Admin-SDK only.
     match /relays/{relayId} {
+      allow read: if isOps()
+        || isOrgOf(resource.data.partnerId)
+        || (isRelay() && claims().relayId == relayId);
+      allow write: if false;
+    }
+
+    // ---- Org membership ------------------------------------------------
+    match /orgUsers/{uid} {
+      allow read: if isOwner(uid) || isOps() || isOrgOf(resource.data.partnerId);
+      allow write: if false;
+    }
+
+    // ---- Server-only ---------------------------------------------------
+    // Invite tokens, username claims, subscriptions, payouts and webhook
+    // bookkeeping are never readable by any client.
+    match /orgInvites/{inviteId} {
+      allow read, write: if false;
+    }
+
+    match /relayUsernames/{username} {
       allow read, write: if false;
     }
 

@@ -12,7 +12,23 @@
       "destination": "/ops.html"
     },
     {
-      "source": "/((?!api/|ops.html).*)",
+      "source": "/org",
+      "destination": "/org.html"
+    },
+    {
+      "source": "/org/(.*)",
+      "destination": "/org.html"
+    },
+    {
+      "source": "/relay",
+      "destination": "/relay.html"
+    },
+    {
+      "source": "/relay/(.*)",
+      "destination": "/relay.html"
+    },
+    {
+      "source": "/((?!api/|ops.html|org.html|relay.html).*)",
       "destination": "/index.html"
     }
   ],

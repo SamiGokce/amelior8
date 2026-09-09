@@ -1,15 +1,20 @@
 rules_version = '2';
 
-// Proof photos are never publicly readable and never client-writable.
+// Delivery photos and purchase receipts are never publicly readable and never
+// client-writable.
 //
-// Both directions go through short-lived v4 signed URLs issued by /api:
-// uploads by an assigned relay (or ops on their behalf), reads only by
-// the donor who paid for that gift. Signed URLs bypass these rules by design,
-// which is exactly why the rules themselves deny everything.
+// Both directions go through short-lived v4 signed URLs issued by /api: uploads
+// by the assigned relay, reads by the donor who paid, the org fulfilling the
+// gift, or ops. Signed URLs bypass these rules by design, which is exactly why
+// the rules themselves deny everything.
 service firebase.storage {
   match /b/{bucket}/o {
 
     match /proofs/{orderId}/{fileName} {
+      allow read, write: if false;
+    }
+
+    match /receipts/{orderId}/{fileName} {
       allow read, write: if false;
     }
 

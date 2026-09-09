@@ -2,8 +2,7 @@ import { createHash } from "node:crypto";
 import Anthropic from "@anthropic-ai/sdk";
 import { FieldValue, adminBucket, adminDb } from "./admin.js";
 import { STATUS } from "../../shared/orderStatus.js";
-import { recordEvent, transitionOrder } from "./orderState.js";
-import { sendOrderEmail } from "./email.js";
+import { recordEvent } from "./orderState.js";
 
 const MODEL = "claude-sonnet-5";
 
@@ -79,11 +78,14 @@ async function findReuse(orderId, hash) {
 }
 
 /**
- * Runs verification on an order's uploaded proof photo and applies the result.
+ * Runs the automatic check on an uploaded proof photo and records the verdict.
  *
- * Pass -> the order moves to VERIFIED and the donor is emailed.
- * Flag/fail -> the order stays DELIVERED with the verdict recorded, and the
- * donor sees "Verification in review". A false "verified" is never shown.
+ * It does NOT decide the outcome. The local org approves or rejects every
+ * delivery; this call gives them a verdict and its reasons to decide with, and
+ * catches a reused or plainly wrong photo before a human looks at it.
+ *
+ * The order stays DELIVERED either way, and the donor sees "Verification in
+ * review" until the org approves. A badge is never granted by this function.
  */
 export async function verifyProof(orderId) {
   const db = adminDb();
@@ -109,8 +111,12 @@ export async function verifyProof(orderId) {
     // No key: leave it pending for a human rather than passing it blind.
     await orderRef.update({
       "verification.state": "pending",
-      "verification.method": null,
-      "verification.reasons": ["Automatic verification is not configured; awaiting human review."],
+      "verification.ai": {
+        state: "unavailable",
+        score: null,
+        reasons: ["Automatic checking is not configured. This needs a human decision."],
+        ranAt: FieldValue.serverTimestamp(),
+      },
       updatedAt: FieldValue.serverTimestamp(),
     });
     return { state: "pending", reason: "not_configured" };
@@ -139,7 +145,12 @@ export async function verifyProof(orderId) {
     console.error(`Verification call failed for ${orderId}:`, err);
     await orderRef.update({
       "verification.state": "pending",
-      "verification.reasons": ["Automatic verification could not run; awaiting human review."],
+      "verification.ai": {
+        state: "unavailable",
+        score: null,
+        reasons: ["Automatic checking could not run. This needs a human decision."],
+        ranAt: FieldValue.serverTimestamp(),
+      },
       updatedAt: FieldValue.serverTimestamp(),
     });
     await recordEvent(orderId, "verification_error", { kind: "system", id: "verification" }, {
@@ -157,21 +168,28 @@ export async function verifyProof(orderId) {
     reasons.unshift(`This photo is byte-identical to the proof on order ${reusedFrom}.`);
   }
 
-  const state = verdict === "pass" ? "passed" : verdict === "fail" ? "failed" : "flagged";
+  const aiState = verdict === "pass" ? "passed" : verdict === "fail" ? "failed" : "flagged";
 
   await orderRef.update({
     proofHash: hash,
     verification: {
-      state,
-      method: "ai",
-      score: result.score ?? null,
-      reasons,
-      showsOrderedItem: result.showsOrderedItem ?? null,
-      showsHandover: result.showsHandover ?? null,
-      locationConsistent: result.locationConsistent ?? null,
+      // Donor-facing: stays "pending" until the local org decides. The badge
+      // is earned by a human approval, not by this verdict.
+      state: "pending",
+      method: null,
       reviewedBy: null,
       reviewedAt: null,
-      verifiedAt: FieldValue.serverTimestamp(),
+      ai: {
+        state: aiState,
+        score: result.score ?? null,
+        reasons,
+        showsOrderedItem: result.showsOrderedItem ?? null,
+        showsHandover: result.showsHandover ?? null,
+        locationConsistent: result.locationConsistent ?? null,
+        reusedFromOrderId: reusedFrom,
+        ranAt: FieldValue.serverTimestamp(),
+      },
+      org: { decision: "pending", by: null, at: null, note: null },
     },
     updatedAt: FieldValue.serverTimestamp(),
   });
@@ -180,16 +198,5 @@ export async function verifyProof(orderId) {
     verdict, score: result.score ?? null, reasons, reusedFrom,
   });
 
-  if (verdict === "pass") {
-    const { order: updated } = await transitionOrder(orderId, STATUS.VERIFIED, {
-      kind: "system", id: "ai",
-    }, { note: "Proof photo passed automatic verification." });
-    await sendOrderEmail(STATUS.VERIFIED, { ...order, ...updated, id: orderId });
-  } else {
-    // Stays DELIVERED. Ops picks it up from the queue; the donor sees
-    // "Verification in review" rather than a badge that isn't earned.
-    console.warn(`Order ${orderId} proof ${state}: ${reasons.join(" ")}`);
-  }
-
-  return { state, verdict, reasons, score: result.score ?? null };
+  return { state: aiState, verdict, reasons, score: result.score ?? null, reusedFrom };
 }

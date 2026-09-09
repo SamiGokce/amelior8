@@ -1,10 +1,11 @@
 import { timingSafeEqual } from "node:crypto";
 import { adminAuth } from "./admin.js";
 import { HttpError } from "./http.js";
+import { ORG_ROLE, isOps, isOrgAdmin, isOrgUser, isRelay } from "../../shared/roles.js";
 
 /**
- * Verifies the Firebase ID token on an authenticated donor request.
- * Every /api route that touches donor data calls this — the client's claim
+ * Verifies the Firebase ID token on an authenticated request.
+ * Every /api route that touches real data calls this — the client's claim
  * about who it is counts for nothing on its own.
  */
 export async function requireUser(req) {
@@ -30,9 +31,8 @@ function safeEqual(a, b) {
 
 /**
  * Ops endpoints need BOTH the shared key and a Firebase account carrying the
- * `role: "ops"` custom claim. The key alone is not enough — a leaked key
- * shouldn't be able to move real orders, and every action stays attributable
- * to a person for the audit trail.
+ * `role: "ops"` claim. A leaked key alone moves nothing, and every action
+ * stays attributable to a person.
  */
 export async function requireOps(req) {
   const expected = process.env.OPS_API_KEY;
@@ -46,8 +46,71 @@ export async function requireOps(req) {
   }
 
   const decoded = await requireUser(req);
-  if (decoded.role !== "ops") {
+  if (!isOps(decoded)) throw new HttpError(403, "Not authorised.", "forbidden");
+  return decoded;
+}
+
+/**
+ * Local org staff. The token carries exactly one partnerId, and every org
+ * endpoint scopes its reads and writes to it — an org can never see or touch
+ * another org's orders, relays or people.
+ *
+ * @param {object} req
+ * @param {{adminOnly?: boolean}} options
+ */
+export async function requireOrg(req, { adminOnly = false } = {}) {
+  const decoded = await requireUser(req);
+
+  if (!isOrgUser(decoded)) {
     throw new HttpError(403, "Not authorised.", "forbidden");
   }
-  return decoded;
+  if (adminOnly && !isOrgAdmin(decoded)) {
+    throw new HttpError(403, "Only an organisation admin can do that.", "admin_only");
+  }
+
+  return {
+    uid: decoded.uid,
+    email: decoded.email || null,
+    name: decoded.name || null,
+    partnerId: decoded.partnerId,
+    orgRole: decoded.orgRole,
+    isAdmin: decoded.orgRole === ORG_ROLE.ADMIN,
+    actor: { kind: "org", id: decoded.uid },
+  };
+}
+
+/**
+ * A relay. Scoped to their own relayId — a relay can only act on gifts
+ * assigned to them, which is checked per order, not just per token.
+ */
+export async function requireRelay(req) {
+  const decoded = await requireUser(req);
+
+  if (!isRelay(decoded)) {
+    throw new HttpError(403, "Not authorised.", "forbidden");
+  }
+
+  return {
+    uid: decoded.uid,
+    relayId: decoded.relayId,
+    partnerId: decoded.partnerId,
+    actor: { kind: "relay", id: decoded.relayId },
+  };
+}
+
+/**
+ * Guards an order against the caller's org. Returns the same 404 as a missing
+ * order so one org cannot probe another's order ids.
+ */
+export function assertOrderBelongsToOrg(order, partnerId) {
+  if (!order || order.partnerId !== partnerId) {
+    throw new HttpError(404, "Order not found.", "order_not_found");
+  }
+}
+
+/** Same, for a relay: the gift must actually be assigned to them. */
+export function assertOrderAssignedToRelay(order, relayId) {
+  if (!order || order.relayId !== relayId) {
+    throw new HttpError(404, "Job not found.", "job_not_found");
+  }
 }

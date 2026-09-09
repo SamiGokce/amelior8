@@ -192,6 +192,12 @@ export const Icon = {
       <path d="M4 12h16M14 6l6 6-6 6" />
     </svg>
   ),
+  camera: (s = 20, c = "currentColor") => (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 8.5a2 2 0 012-2h2.2l1.2-2h7.2l1.2 2H20a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+      <circle cx="12.5" cy="13" r="3.6" />
+    </svg>
+  ),
   quote: (s = 20, c = "currentColor") => (
     <svg width={s} height={s} viewBox="0 0 24 24" fill={c} stroke="none">
       <path d="M9.5 5.5C6.4 6.9 4.5 9.6 4.5 13v5.5h6.2V13H7.6c0-2.3 1-3.9 2.9-4.9zm10 0c-3.1 1.4-5 4.1-5 7.5v5.5h6.2V13h-3.1c0-2.3 1-3.9 2.9-4.9z" />

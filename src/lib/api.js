@@ -1,50 +1,8 @@
-// Typed-ish fetch wrapper for /api. Every authenticated call carries the
-// Firebase ID token; the server verifies it on each request.
+// Donor-facing API calls. The shared transport lives in request.js.
 
-import { auth } from "./firebase";
+import { request } from "./request";
 
-export class ApiError extends Error {
-  constructor(message, status, code) {
-    super(message);
-    this.name = "ApiError";
-    this.status = status;
-    this.code = code;
-  }
-}
-
-async function request(path, { method = "GET", body, authed = true } = {}) {
-  const headers = { "Content-Type": "application/json" };
-
-  if (authed) {
-    const user = auth.currentUser;
-    if (!user) throw new ApiError("You need to be signed in.", 401, "unauthenticated");
-    headers.Authorization = `Bearer ${await user.getIdToken()}`;
-  }
-
-  const res = await fetch(`/api${path}`, {
-    method,
-    headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-
-  const text = await res.text();
-  let payload = null;
-  try {
-    payload = text ? JSON.parse(text) : null;
-  } catch {
-    // Non-JSON response (a proxy error page, say) — surface the status instead.
-  }
-
-  if (!res.ok) {
-    throw new ApiError(
-      payload?.error || `Request failed (${res.status})`,
-      res.status,
-      payload?.code || "unknown",
-    );
-  }
-
-  return payload;
-}
+export { ApiError } from "./request";
 
 export const api = {
   /** Creates the order + Stripe Checkout Session. Price is computed server-side. */

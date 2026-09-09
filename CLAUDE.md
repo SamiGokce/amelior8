@@ -22,29 +22,44 @@ a four-stage order state machine, and AI-verified delivery photos.
 ## Structure
 
 ```
-shared/orderStatus.js     # order lifecycle — imported by BOTH client and api
+shared/
+  orderStatus.js          # order lifecycle — imported by client AND api
+  roles.js                # who can do what; relay username/PIN identity
 src/
-  App.jsx                 # router + auth gate + phone shell
-  theme.js                # colors, fonts, surfaces, radius, shadow
-  icons.jsx               # the Icon object
-  components/             # Btn, Chip, SearchField, Catalog, Brand, Header, States
+  theme.js  icons.jsx  components/  lib/     # shared by all three front ends
+  App.jsx  screens/  hooks/                  # donor app          -> index.html
+  org/     App.jsx api.js components.jsx screens/   # org portal  -> org.html
+  relay/   App.jsx api.js offline.js PhotoInput.jsx screens/  # relay -> relay.html
   DesignPreview.jsx       # dev-only reference screens, stripped from prod
-  screens/                # one file per screen
-  hooks/                  # useAuth, useCatalog, useOrder
-  lib/                    # firebase.js, api.js, format.js
 api/
-  _lib/                   # admin, auth, stripe, email, orderState, proof, verification
-  checkout/session.js     # creates the order + Stripe session
-  webhooks/stripe.js      # the source of truth for payment
-  orders/[id]/            # proof upload (relay), proof read (donor)
-  ops/                    # stand-in for the relay app until it exists
-  subscriptions/
+  _lib/                   # admin, auth, stripe, email, orderState, proof,
+                          # verification, review, invites
+  checkout/  webhooks/  orders/  subscriptions/     # donor
+  org/                    # org portal: queue, assign, review, relays, invites
+  relay/                  # relay app: jobs, purchase, deliver
+  ops/                    # Amelior8 backstop + org onboarding
+  invites/accept.js
 public/ops.html           # internal ops console
 scripts/seed-catalog.mjs  # placeholder catalog data
-firestore.rules           # deny by default
-storage.rules
+firestore.rules  storage.rules  firestore.indexes.json
 tests/
 ```
+
+## The three surfaces and who does what
+
+| Step | Who | Where |
+|---|---|---|
+| Buys a gift | Donor | `/` |
+| Assigns a relay + records the recipient | Org staff | `/org` |
+| Buys the gift, submits receipt + amount | Relay | `/relay` |
+| Hands it over, submits the photo | Relay | `/relay` |
+| Automatic check runs | System | advisory only |
+| Approves or rejects the delivery | Org staff | `/org` |
+| Backstop override for disputes | Amelior8 ops | `/ops` |
+
+Roles live in Firebase Auth custom claims, set only by the Admin SDK. Ops
+invites an organisation; that org's admin invites their own colleagues and
+creates their own relays.
 
 ## Commands
 - `npm run dev` — local dev server
@@ -55,6 +70,8 @@ tests/
 - `npm run emulator` / `seed:emulator` / `dev:emulator` — local Firebase
   emulator workflow (needs Java installed)
 - `npm run screenshot` — build, launch, capture a 2x retina screenshot
+
+Local URLs: `/` donor, `/org` org portal, `/relay` relay app, `/ops.html` ops.
 
 ## Workflow
 - Always commit and push after completing changes
@@ -76,6 +93,14 @@ These protect real money and real donor data. Do not work around them.
 - **Every state change appends an event** to `orders/{id}/events`.
 - **Never show a verification badge that isn't earned.** A pending or flagged
   photo reads "Verification in review", never "Verified".
+- **The AI check advises; it never decides.** Only a human approval moves an
+  order to VERIFIED. "AI Verified" is shown only when the check passed AND a
+  human agreed; a human approving over a flag reads plain "Verified".
+- **One `reviewDelivery()`.** Org and ops approvals run the same code path.
+- **An org is scoped to its own partnerId, a relay to its own relayId**, checked
+  server-side per request and per order — never from anything the client sends.
+- **Never tell a relay something was submitted until the server confirmed it.**
+  Offline work reads "waiting to send", not "done".
 - **No auto-simulation.** Nothing advances an order on a timer. A real donor
   must never see fabricated progress.
 - **Secrets stay server-side.** Anything `VITE_` prefixed ships to the browser.
@@ -95,8 +120,11 @@ These protect real money and real donor data. Do not work around them.
   CTA colour — this follows the approved mockups and diverges from BRAND.md's
   "Burnt Orange for primary actions" and Cloud Dancer backgrounds. Typography,
   the wordmark and the palette itself are unchanged.
-- `npm run dev` then `/preview` renders the three reference screens with sample
-  data. It is dev-only and tree-shaken out of production builds.
+- `npm run dev` then `/preview` renders the three donor reference screens with
+  sample data. `/org.html?preview=1` and `/relay.html?preview=1` do the same for
+  the org portal and relay app, stubbing the API with fixtures so the screens
+  behind a login can be checked without credentials. All dev-only and dropped
+  from production builds (verified against `dist/`).
 
 ### Key brand colors
 - Burnt Orange `#CC5602` — logo, headlines, CTAs
