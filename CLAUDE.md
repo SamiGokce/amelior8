@@ -2,8 +2,8 @@
 
 ## Project overview
 React donation app (Vite + React 18) deployed on Vercel. A donor buys a
-specific gift for a recipient in a specific place. A vetted local facilitator
-("GR8") buys it and hands it over, and the donor gets photo proof.
+specific gift for a recipient in a specific place. A vetted local relay
+("relay") buys it and hands it over, and the donor gets photo proof.
 
 Real Stripe payments, Firebase Auth accounts, a Firestore-backed gift catalog,
 a four-stage order state machine, and AI-verified delivery photos.
@@ -36,8 +36,8 @@ api/
   _lib/                   # admin, auth, stripe, email, orderState, proof, verification
   checkout/session.js     # creates the order + Stripe session
   webhooks/stripe.js      # the source of truth for payment
-  orders/[id]/            # proof upload (facilitator), proof read (donor)
-  ops/                    # stand-in for the GR8 app until it exists
+  orders/[id]/            # proof upload (relay), proof read (donor)
+  ops/                    # stand-in for the relay app until it exists
   subscriptions/
 public/ops.html           # internal ops console
 scripts/seed-catalog.mjs  # placeholder catalog data

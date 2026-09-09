@@ -4,13 +4,13 @@ import { completeProof, createProofUploadUrl } from "../../../_lib/proof.js";
 import { verifyProof } from "../../../_lib/verification.js";
 
 /**
- * Proof upload on a facilitator's behalf, until the GR8 app exists.
+ * Proof upload on a relay's behalf, until the relay app exists.
  *
  *   POST { contentType }        -> { uploadUrl, path }   (then PUT the bytes)
  *   POST { path, complete: true } -> confirms the upload, moves the order to
  *                                    DELIVERED, and runs verification
  *
- * Shares createProofUploadUrl/completeProof with the facilitator route, so the
+ * Shares createProofUploadUrl/completeProof with the relay route, so the
  * two can never diverge.
  */
 export default withErrors(async (req, res) => {

@@ -65,7 +65,7 @@ service cloud.firestore {
     }
 
     // ---- Server-only collections --------------------------------------
-    match /facilitators/{facilitatorId} {
+    match /relays/{relayId} {
       allow read, write: if false;
     }
 

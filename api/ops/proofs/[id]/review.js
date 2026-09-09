@@ -12,7 +12,7 @@ import { STATUS } from "../../../../shared/orderStatus.js";
  * Ops can approve or reject regardless of what the AI decided, in both
  * directions: a wrongly flagged photo can be approved, and a wrongly passed
  * one rejected. Either way the decision is recorded against a named person, so
- * a facilitator whose payment depends on it has something to appeal to.
+ * a relay whose payment depends on it has something to appeal to.
  */
 export default withErrors(async (req, res) => {
   if (!methodGuard(req, res, "POST")) return;

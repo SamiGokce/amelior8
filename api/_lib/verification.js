@@ -56,7 +56,7 @@ Assess the attached photo:
 2. Does it show a handover, or the item in a recipient's possession?
 3. Is anything visibly inconsistent with the stated country?
 
-A real donor sees the result of this check, and a real facilitator's payment
+A real donor sees the result of this check, and a real relay's payment
 depends on it. Do not pass a photo you are unsure about — use "flag" and let a
 person decide. Do not fail a photo merely for being ordinary or poorly lit.
 

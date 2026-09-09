@@ -11,7 +11,7 @@ const STAGE_KEY = {
 };
 
 /**
- * The ONLY way an order's status changes. Ops endpoints call it today, the GR8
+ * The ONLY way an order's status changes. Ops endpoints call it today, the relay
  * app will call it later, the Stripe webhook calls it for funding and refunds.
  * Nothing anywhere writes `status` directly.
  *
@@ -23,7 +23,7 @@ const STAGE_KEY = {
  *
  * @param {string} orderId
  * @param {string} toStatus
- * @param {{kind: "system"|"ops"|"facilitator"|"donor", id: string}} actor
+ * @param {{kind: "system"|"ops"|"relay"|"donor", id: string}} actor
  * @param {{note?: string, patch?: object, metadata?: object}} options
  * @returns {Promise<{changed: boolean, order: object, fromStatus: string}>}
  */

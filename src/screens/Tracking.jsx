@@ -71,7 +71,7 @@ function ProofPhoto({ orderId, rounded = radius.xl }) {
 }
 
 function DeliveredBy({ order }) {
-  const fac = order.facilitatorSnapshot;
+  const fac = order.relaySnapshot;
   if (!fac) return null;
   const place = [order.partnerSnapshot?.location, order.countrySnapshot?.name || order.countryCode]
     .filter(Boolean).join(", ");

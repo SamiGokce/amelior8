@@ -70,7 +70,7 @@ export function canTransition(from, to, heldFrom = null) {
 
 export const STAGES = [
   { key: "funded", label: "Money received", reachedAt: [STATUS.FUNDED, STATUS.ASSIGNED, STATUS.PURCHASED, STATUS.DELIVERED, STATUS.PROOF_REJECTED, STATUS.VERIFIED] },
-  { key: "assigned", label: "GR8 chosen", reachedAt: [STATUS.ASSIGNED, STATUS.PURCHASED, STATUS.DELIVERED, STATUS.PROOF_REJECTED, STATUS.VERIFIED] },
+  { key: "assigned", label: "Relay chosen", reachedAt: [STATUS.ASSIGNED, STATUS.PURCHASED, STATUS.DELIVERED, STATUS.PROOF_REJECTED, STATUS.VERIFIED] },
   { key: "purchased", label: "Gift bought", reachedAt: [STATUS.PURCHASED, STATUS.DELIVERED, STATUS.PROOF_REJECTED, STATUS.VERIFIED] },
   { key: "delivered", label: "Gift delivered", reachedAt: [STATUS.DELIVERED, STATUS.VERIFIED] },
 ];
@@ -105,9 +105,9 @@ export function statusExplanation(order) {
     case STATUS.PAYMENT_FAILED:
       return "Your payment did not go through. Nothing was charged.";
     case STATUS.FUNDED:
-      return "Your gift is funded. We are matching it with a GR8 in the area — this can take a day or two.";
+      return "Your gift is funded. We are matching it with a relay in the area — this can take a day or two.";
     case STATUS.ASSIGNED:
-      return "A GR8 has been assigned and is arranging the purchase.";
+      return "A relay has been assigned and is arranging the purchase.";
     case STATUS.PURCHASED:
       return "The gift has been bought and is on its way to the recipient.";
     case STATUS.DELIVERED:
@@ -117,7 +117,7 @@ export function statusExplanation(order) {
     case STATUS.VERIFIED:
       return "Delivered and verified.";
     case STATUS.PROOF_REJECTED:
-      return "The delivery photo did not pass our check. We have asked the GR8 for another one.";
+      return "The delivery photo did not pass our check. We have asked the relay for another one.";
     case STATUS.ON_HOLD:
       return "This gift is temporarily on hold. We will email you as soon as it moves again.";
     case STATUS.CANCELLED:

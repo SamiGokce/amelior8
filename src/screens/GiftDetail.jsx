@@ -57,7 +57,7 @@ export default function GiftDetail() {
   }
 
   const partner = partners.find((p) => p.partnerId === item.partnerId || p.id === item.partnerId);
-  const unit = item.priceUsdCents + item.facilitatorFeeUsdCents + item.platformFeeUsdCents;
+  const unit = item.priceUsdCents + item.relayFeeUsdCents + item.platformFeeUsdCents;
   const total = unit * quantity;
   const meta = CATEGORY_META[item.category] || {};
 
@@ -120,7 +120,7 @@ export default function GiftDetail() {
         />
         <InfoTile
           icon="user" iconColor={colors.textSecondary} iconBg="rgba(107, 107, 82, 0.12)"
-          value="Local" label="Facilitator"
+          value="Local" label="Relay"
         />
         <InfoTile
           icon="video" iconColor={colors.categoryWater} iconBg="rgba(59, 147, 224, 0.12)"

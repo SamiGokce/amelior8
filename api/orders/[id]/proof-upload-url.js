@@ -5,10 +5,10 @@ import { getOrder } from "../../_lib/orderState.js";
 import { verifyProof } from "../../_lib/verification.js";
 
 /**
- * Facilitator-facing proof upload. The GR8 app will call this.
+ * Relay-facing proof upload. The relay app will call this.
  *
- * It requires a `role: "facilitator"` custom claim, which nobody holds yet —
- * that is deliberate. Until the GR8 app exists, ops uploads on a facilitator's
+ * It requires a `role: "relay"` custom claim, which nobody holds yet —
+ * that is deliberate. Until the relay app exists, ops uploads on a relay's
  * behalf through /api/ops/orders/[id]/proof-upload-url, which shares the same
  * implementation.
  */
@@ -16,7 +16,7 @@ export default withErrors(async (req, res) => {
   if (!methodGuard(req, res, "POST")) return;
 
   const user = await requireUser(req);
-  if (user.role !== "facilitator") {
+  if (user.role !== "relay") {
     throw new HttpError(403, "Not authorised.", "forbidden");
   }
 
@@ -24,11 +24,11 @@ export default withErrors(async (req, res) => {
   const { contentType = "image/jpeg", path, complete, recipientMessage } = readJsonBody(req);
 
   const order = await getOrder(orderId);
-  if (order.facilitatorId !== user.facilitatorId) {
-    throw new HttpError(403, "This gift is assigned to another GR8.", "not_your_order");
+  if (order.relayId !== user.relayId) {
+    throw new HttpError(403, "This gift is assigned to another relay.", "not_your_order");
   }
 
-  const actor = { kind: "facilitator", id: user.facilitatorId || user.uid };
+  const actor = { kind: "relay", id: user.relayId || user.uid };
 
   if (complete) {
     const updated = await completeProof(orderId, path, actor, { recipientMessage });

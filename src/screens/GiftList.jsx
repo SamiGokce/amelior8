@@ -39,7 +39,7 @@ export default function GiftList() {
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "9px" }}>
           {matching.map((item) => {
-            const total = item.priceUsdCents + item.facilitatorFeeUsdCents + item.platformFeeUsdCents;
+            const total = item.priceUsdCents + item.relayFeeUsdCents + item.platformFeeUsdCents;
             const unavailable = item.available === false;
             return (
               <div

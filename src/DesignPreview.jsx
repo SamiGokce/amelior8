@@ -126,7 +126,7 @@ function DetailPreview() {
       <div style={{ display: "flex", gap: "8px", marginBottom: "20px" }}>
         {[
           { icon: "heart", c: colors.accent, bg: colors.accentLight, v: "$55", l: "Donation" },
-          { icon: "user", c: colors.textSecondary, bg: "rgba(107,107,82,0.12)", v: "Local", l: "Facilitator" },
+          { icon: "user", c: colors.textSecondary, bg: "rgba(107,107,82,0.12)", v: "Local", l: "Relay" },
           { icon: "video", c: colors.categoryWater, bg: "rgba(59,147,224,0.12)", v: "Photo", l: "You receive" },
         ].map((t) => (
           <div key={t.l} style={{ flex: 1, ...surfaces.tile, padding: "12px 10px", minWidth: 0 }}>

@@ -30,7 +30,7 @@ export default withErrors(async (req, res) => {
         partner: o.partnerSnapshot?.name,
         country: o.countrySnapshot?.name || o.countryCode,
         totalCharged: o.totalCharged,
-        facilitator: o.facilitatorSnapshot?.name || null,
+        relay: o.relaySnapshot?.name || null,
         verification: o.verification?.state || "none",
         createdAt: iso(o.createdAt),
       };

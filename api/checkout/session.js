@@ -62,7 +62,7 @@ export default withErrors(async (req, res) => {
       category: item.category,
       imageUrl: item.imageUrl || null,
       priceUsdCents: item.priceUsdCents,
-      facilitatorFeeUsdCents: item.facilitatorFeeUsdCents,
+      relayFeeUsdCents: item.relayFeeUsdCents,
       platformFeeUsdCents: item.platformFeeUsdCents,
       estimatedDeliveryDays: item.estimatedDeliveryDays || null,
     },
@@ -80,7 +80,7 @@ export default withErrors(async (req, res) => {
 
     quantity: price.quantity,
     giftAmount: price.giftAmount,
-    facilitatorFee: price.facilitatorFee,
+    relayFee: price.relayFee,
     platformFee: price.platformFee,
     totalCharged: price.totalCharged,
     currency: "USD",
@@ -92,8 +92,8 @@ export default withErrors(async (req, res) => {
 
     status: STATUS.PENDING_PAYMENT,
     stageTimestamps: {},
-    facilitatorId: null,
-    facilitatorSnapshot: null,
+    relayId: null,
+    relaySnapshot: null,
     recipientRef: null,
     estimatedDeliveryAt: null,
 
@@ -101,7 +101,7 @@ export default withErrors(async (req, res) => {
     verification: { state: "none", method: null, score: null, reasons: [], reviewedBy: null, reviewedAt: null },
 
     // Recorded for the payout system that does not exist yet. Nothing acts on it.
-    facilitatorEarning: { amountUsdCents: price.facilitatorFee, status: "accrued", payoutId: null },
+    relayEarning: { amountUsdCents: price.relayFee, status: "accrued", payoutId: null },
 
     createdAt: FieldValue.serverTimestamp(),
     updatedAt: FieldValue.serverTimestamp(),

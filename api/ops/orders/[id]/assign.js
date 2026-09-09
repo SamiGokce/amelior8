@@ -6,9 +6,9 @@ import { sendOrderEmail } from "../../../_lib/email.js";
 import { STATUS } from "../../../../shared/orderStatus.js";
 
 /**
- * Assigns a GR8 to a funded gift. FUNDED -> ASSIGNED.
+ * Assigns a relay to a funded gift. FUNDED -> ASSIGNED.
  *
- * The GR8 app will eventually do this itself (accepting a job); it calls the
+ * The relay app will eventually do this itself (accepting a job); it calls the
  * same transitionOrder underneath, so no donor-side code changes when it does.
  */
 export default withErrors(async (req, res) => {
@@ -16,21 +16,21 @@ export default withErrors(async (req, res) => {
   const ops = await requireOps(req);
 
   const orderId = req.query.id;
-  const { facilitatorId } = readJsonBody(req);
-  if (!facilitatorId) throw new HttpError(400, "facilitatorId is required.", "missing_facilitator");
+  const { relayId } = readJsonBody(req);
+  if (!relayId) throw new HttpError(400, "relayId is required.", "missing_relay");
 
-  const facSnap = await adminDb().collection("facilitators").doc(facilitatorId).get();
-  if (!facSnap.exists) throw new HttpError(404, "No such facilitator.", "facilitator_not_found");
-  const facilitator = facSnap.data();
-  if (facilitator.active === false) {
-    throw new HttpError(409, "That facilitator is not active.", "facilitator_inactive");
+  const facSnap = await adminDb().collection("relays").doc(relayId).get();
+  if (!facSnap.exists) throw new HttpError(404, "No such relay.", "relay_not_found");
+  const relay = facSnap.data();
+  if (relay.active === false) {
+    throw new HttpError(409, "That relay is not active.", "relay_inactive");
   }
 
   const order = await getOrder(orderId);
-  if (facilitator.countryCode !== order.countryCode) {
+  if (relay.countryCode !== order.countryCode) {
     throw new HttpError(
       409,
-      `That GR8 works in ${facilitator.countryCode}, but this gift is for ${order.countryCode}.`,
+      `That relay works in ${relay.countryCode}, but this gift is for ${order.countryCode}.`,
       "country_mismatch",
     );
   }
@@ -44,14 +44,14 @@ export default withErrors(async (req, res) => {
     STATUS.ASSIGNED,
     { kind: "ops", id: ops.uid },
     {
-      note: `Assigned to ${facilitator.name}.`,
+      note: `Assigned to ${relay.name}.`,
       patch: {
-        facilitatorId,
+        relayId,
         // Denormalised so the donor's tracking screen never reads the
-        // facilitators collection, which stays server-only.
-        facilitatorSnapshot: {
-          name: facilitator.name,
-          photoUrl: facilitator.photoUrl || null,
+        // relays collection, which stays server-only.
+        relaySnapshot: {
+          name: relay.name,
+          photoUrl: relay.photoUrl || null,
         },
         estimatedDeliveryAt,
       },
@@ -60,5 +60,5 @@ export default withErrors(async (req, res) => {
 
   if (changed) await sendOrderEmail(STATUS.ASSIGNED, { ...order, ...updated, id: orderId });
 
-  json(res, 200, { orderId, status: STATUS.ASSIGNED, changed, facilitator: facilitator.name });
+  json(res, 200, { orderId, status: STATUS.ASSIGNED, changed, relay: relay.name });
 });

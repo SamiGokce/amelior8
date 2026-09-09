@@ -46,7 +46,7 @@ Amelior8 connects you with local partners who deliver your gift in person. Funds
 function receiptRows(order) {
   const rows = [
     ["Gift", money(order.giftAmount)],
-    ["Delivery by a local GR8", money(order.facilitatorFee)],
+    ["Delivery by a local relay", money(order.relayFee)],
     ["Amelior8 platform fee", money(order.platformFee)],
   ];
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:${C.charcoal};">
@@ -60,7 +60,7 @@ function template(type, order) {
   const partner = order.partnerSnapshot?.name || "our local partner";
   const country = order.countrySnapshot?.name || order.countryCode || "";
   const url = `${BASE()}/orders/${order.id || order.orderId}`;
-  const gr8 = order.facilitatorSnapshot?.name?.split(" ")[0] || "A GR8";
+  const relayName = order.relaySnapshot?.name?.split(" ")[0] || "A relay";
 
   switch (type) {
     case STATUS.FUNDED:
@@ -69,7 +69,7 @@ function template(type, order) {
         html: layout({
           heading: "Your gift is confirmed",
           body: `<p style="margin:0 0 4px;">Thank you. You have given <strong>${item}</strong> in ${country}.</p>
-<p style="margin:0;">Funds go to <strong>${partner}</strong>, who will source the gift. A vetted local GR8 will buy it and hand it over in person, and you will get a photo when they do.</p>
+<p style="margin:0;">Funds go to <strong>${partner}</strong>, who will source the gift. A vetted local relay will buy it and hand it over in person, and you will get a photo when they do.</p>
 ${receiptRows(order)}
 <p style="margin:0;">Order <strong>${order.id || order.orderId}</strong></p>`,
           cta: "Track your gift",
@@ -79,10 +79,10 @@ ${receiptRows(order)}
 
     case STATUS.ASSIGNED:
       return {
-        subject: `${gr8} is delivering your gift`,
+        subject: `${relayName} is delivering your gift`,
         html: layout({
-          heading: "A GR8 has been assigned",
-          body: `<p style="margin:0 0 12px;"><strong>${gr8}</strong> will buy and deliver <strong>${item}</strong> in ${country}.</p>
+          heading: "A relay has been assigned",
+          body: `<p style="margin:0 0 12px;"><strong>${relayName}</strong> will buy and deliver <strong>${item}</strong> in ${country}.</p>
 <p style="margin:0;">You will hear from us again when the gift has been bought.</p>`,
           cta: "Track your gift",
           ctaUrl: url,
@@ -94,7 +94,7 @@ ${receiptRows(order)}
         subject: `Your gift has been bought`,
         html: layout({
           heading: "The gift has been bought",
-          body: `<p style="margin:0;"><strong>${gr8}</strong> has purchased <strong>${item}</strong> and is arranging the handover.</p>`,
+          body: `<p style="margin:0;"><strong>${relayName}</strong> has purchased <strong>${item}</strong> and is arranging the handover.</p>`,
           cta: "Track your gift",
           ctaUrl: url,
         }),
@@ -105,7 +105,7 @@ ${receiptRows(order)}
         subject: `Delivered — ${item}`,
         html: layout({
           heading: "Your gift was delivered",
-          body: `<p style="margin:0 0 12px;"><strong>${item}</strong> reached its recipient in ${country}, delivered by ${gr8}.</p>
+          body: `<p style="margin:0 0 12px;"><strong>${item}</strong> reached its recipient in ${country}, delivered by ${relayName}.</p>
 <p style="margin:0;">The delivery photo is on your tracking page.</p>`,
           cta: "See the proof",
           ctaUrl: url,
@@ -117,7 +117,7 @@ ${receiptRows(order)}
         subject: `An update on your gift`,
         html: layout({
           heading: "We are re-checking the delivery",
-          body: `<p style="margin:0 0 12px;">The delivery photo for <strong>${item}</strong> did not pass our verification check, so we have asked the GR8 for another one.</p>
+          body: `<p style="margin:0 0 12px;">The delivery photo for <strong>${item}</strong> did not pass our verification check, so we have asked the relay for another one.</p>
 <p style="margin:0;">This is a routine check and often just means an unclear photo. We will confirm as soon as it clears.</p>`,
           cta: "Track your gift",
           ctaUrl: url,

@@ -47,19 +47,19 @@ const PARTNERS = [
   { partnerId: "harvest-hope", name: "Harvest Hope", countryCode: "TZ", location: "Dar es Salaam" },
 ];
 
-// Prices in integer USD cents. gift + facilitator fee + platform fee is what
+// Prices in integer USD cents. gift + relay fee + platform fee is what
 // the donor is charged, broken out for them at checkout.
 const ITEMS = [
-  { itemId: "water-filter-family", name: "Family water filter", description: "A household ceramic filter that gives one family clean drinking water for about two years.", category: "water", priceUsdCents: 3200, facilitatorFeeUsdCents: 700, platformFeeUsdCents: 400, partnerId: "maji-safi", countryCode: "KE", estimatedDeliveryDays: 7 },
-  { itemId: "water-jerrycans", name: "Two 20L jerrycans", description: "Sealed water containers so a household can carry and store clean water safely.", category: "water", priceUsdCents: 1800, facilitatorFeeUsdCents: 600, platformFeeUsdCents: 300, partnerId: "clean-wells", countryCode: "KE", estimatedDeliveryDays: 5 },
-  { itemId: "school-kit", name: "School supply kit", description: "Exercise books, pens, pencils and a backpack for one pupil for a full term.", category: "education", priceUsdCents: 2200, facilitatorFeeUsdCents: 600, platformFeeUsdCents: 300, partnerId: "bright-futures", countryCode: "UG", estimatedDeliveryDays: 6 },
-  { itemId: "reading-books", name: "Set of five reading books", description: "Age-appropriate storybooks in English and the local language for a primary reader.", category: "education", priceUsdCents: 2600, facilitatorFeeUsdCents: 700, platformFeeUsdCents: 350, partnerId: "read-africa", countryCode: "NG", estimatedDeliveryDays: 8 },
-  { itemId: "mosquito-nets", name: "Two treated mosquito nets", description: "Long-lasting insecticide-treated bed nets covering a family sleeping area.", category: "health", priceUsdCents: 1600, facilitatorFeeUsdCents: 600, platformFeeUsdCents: 250, partnerId: "rural-health-ke", countryCode: "KE", estimatedDeliveryDays: 5 },
-  { itemId: "first-aid-kit", name: "Household first aid kit", description: "Basic wound care, antiseptic, and rehydration salts for a rural household.", category: "health", priceUsdCents: 2900, facilitatorFeeUsdCents: 700, platformFeeUsdCents: 350, partnerId: "medaid-ug", countryCode: "UG", estimatedDeliveryDays: 7 },
-  { itemId: "food-parcel-month", name: "One month of food staples", description: "Maize flour, beans, rice, cooking oil and salt for a family of four for a month.", category: "food", priceUsdCents: 4200, facilitatorFeeUsdCents: 800, platformFeeUsdCents: 500, partnerId: "harvest-hope", countryCode: "TZ", estimatedDeliveryDays: 6 },
-  { itemId: "school-uniform", name: "A school uniform", description: "Shirt, trousers or skirt, and shoes so a child can attend school without being turned away.", category: "clothing", priceUsdCents: 2400, facilitatorFeeUsdCents: 650, platformFeeUsdCents: 320, partnerId: "bright-futures", countryCode: "UG", estimatedDeliveryDays: 8 },
-  { itemId: "warm-blankets", name: "Two warm blankets", description: "Heavy blankets for a household through the cold season.", category: "clothing", priceUsdCents: 2000, facilitatorFeeUsdCents: 600, platformFeeUsdCents: 280, partnerId: "harvest-hope", countryCode: "TZ", estimatedDeliveryDays: 6 },
-  { itemId: "school-meals-term", name: "A term of school meals", description: "One hot meal a day for one child for a full school term.", category: "food", priceUsdCents: 3500, facilitatorFeeUsdCents: 700, platformFeeUsdCents: 420, partnerId: "feed-the-future", countryCode: "NG", estimatedDeliveryDays: 9 },
+  { itemId: "water-filter-family", name: "Family water filter", description: "A household ceramic filter that gives one family clean drinking water for about two years.", category: "water", priceUsdCents: 3200, relayFeeUsdCents: 700, platformFeeUsdCents: 400, partnerId: "maji-safi", countryCode: "KE", estimatedDeliveryDays: 7 },
+  { itemId: "water-jerrycans", name: "Two 20L jerrycans", description: "Sealed water containers so a household can carry and store clean water safely.", category: "water", priceUsdCents: 1800, relayFeeUsdCents: 600, platformFeeUsdCents: 300, partnerId: "clean-wells", countryCode: "KE", estimatedDeliveryDays: 5 },
+  { itemId: "school-kit", name: "School supply kit", description: "Exercise books, pens, pencils and a backpack for one pupil for a full term.", category: "education", priceUsdCents: 2200, relayFeeUsdCents: 600, platformFeeUsdCents: 300, partnerId: "bright-futures", countryCode: "UG", estimatedDeliveryDays: 6 },
+  { itemId: "reading-books", name: "Set of five reading books", description: "Age-appropriate storybooks in English and the local language for a primary reader.", category: "education", priceUsdCents: 2600, relayFeeUsdCents: 700, platformFeeUsdCents: 350, partnerId: "read-africa", countryCode: "NG", estimatedDeliveryDays: 8 },
+  { itemId: "mosquito-nets", name: "Two treated mosquito nets", description: "Long-lasting insecticide-treated bed nets covering a family sleeping area.", category: "health", priceUsdCents: 1600, relayFeeUsdCents: 600, platformFeeUsdCents: 250, partnerId: "rural-health-ke", countryCode: "KE", estimatedDeliveryDays: 5 },
+  { itemId: "first-aid-kit", name: "Household first aid kit", description: "Basic wound care, antiseptic, and rehydration salts for a rural household.", category: "health", priceUsdCents: 2900, relayFeeUsdCents: 700, platformFeeUsdCents: 350, partnerId: "medaid-ug", countryCode: "UG", estimatedDeliveryDays: 7 },
+  { itemId: "food-parcel-month", name: "One month of food staples", description: "Maize flour, beans, rice, cooking oil and salt for a family of four for a month.", category: "food", priceUsdCents: 4200, relayFeeUsdCents: 800, platformFeeUsdCents: 500, partnerId: "harvest-hope", countryCode: "TZ", estimatedDeliveryDays: 6 },
+  { itemId: "school-uniform", name: "A school uniform", description: "Shirt, trousers or skirt, and shoes so a child can attend school without being turned away.", category: "clothing", priceUsdCents: 2400, relayFeeUsdCents: 650, platformFeeUsdCents: 320, partnerId: "bright-futures", countryCode: "UG", estimatedDeliveryDays: 8 },
+  { itemId: "warm-blankets", name: "Two warm blankets", description: "Heavy blankets for a household through the cold season.", category: "clothing", priceUsdCents: 2000, relayFeeUsdCents: 600, platformFeeUsdCents: 280, partnerId: "harvest-hope", countryCode: "TZ", estimatedDeliveryDays: 6 },
+  { itemId: "school-meals-term", name: "A term of school meals", description: "One hot meal a day for one child for a full school term.", category: "food", priceUsdCents: 3500, relayFeeUsdCents: 700, platformFeeUsdCents: 420, partnerId: "feed-the-future", countryCode: "NG", estimatedDeliveryDays: 9 },
 ];
 
 function db() {
@@ -96,7 +96,7 @@ async function main() {
   if (DRY_RUN) {
     console.log(`${COUNTRIES.length} countries, ${PARTNERS.length} partners, ${ITEMS.length} gift items`);
     for (const item of ITEMS) {
-      const total = item.priceUsdCents + item.facilitatorFeeUsdCents + item.platformFeeUsdCents;
+      const total = item.priceUsdCents + item.relayFeeUsdCents + item.platformFeeUsdCents;
       console.log(`  ${item.itemId.padEnd(22)} $${(total / 100).toFixed(2)} (${item.countryCode})`);
     }
     return;

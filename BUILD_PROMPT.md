@@ -16,12 +16,12 @@ Do not work on any of the following. They are separate, later efforts:
   `colors`, and `fonts` tokens and the existing screen layouts exactly as they
   are. New screens should be assembled from existing patterns and the existing
   `Icon` set. Design will be revisited separately.
-- **The GR8 facilitator app.** Not built here. But every contract it will need
+- **The relay relay app.** Not built here. But every contract it will need
   (data model, state machine, API endpoints) must exist and be exercised by this
   build, so that app can be added later with zero changes to donor-side code.
 - **The admin/ops console.** Not built here. Protected ops endpoints stand in
   for it.
-- **Facilitator payouts.** No payout rail (M-Pesa, Flutterwave, Stripe Connect)
+- **Relay payouts.** No payout rail (M-Pesa, Flutterwave, Stripe Connect)
   is chosen yet. Model the money owed, write the ledger records, wire nothing.
 
 ---
@@ -30,18 +30,18 @@ Do not work on any of the following. They are separate, later efforts:
 
 Amelior8 is a marketplace for verified charitable giving. A donor buys a
 specific, real gift for a specific recipient in a specific place. A vetted local
-facilitator ("GR8") buys that gift and hands it over. The donor gets photo proof
+relay ("relay") buys that gift and hands it over. The donor gets photo proof
 of the handover.
 
 The mental model is Uber Eats: a catalog of concrete items at concrete prices, a
 person assigned to fulfil the order, and live status tracking through to
-delivery. The facilitator is compensated per delivery like a driver.
+delivery. The relay is compensated per delivery like a driver.
 
 ### The four donor-visible stages
 
 1. **Money received** — donation captured, funds cleared
-2. **GR8 chosen** — a facilitator has been assigned to this gift
-3. **Gift bought** — facilitator has purchased the item
+2. **relay chosen** — a relay has been assigned to this gift
+3. **Gift bought** — relay has purchased the item
 4. **Gift delivered** — handed to the recipient, photo proof captured
 
 > **Assumption to confirm:** stage 4 is the gift being delivered *to the
@@ -67,7 +67,7 @@ delivery. The facilitator is compensated per delivery like a driver.
 | Hardcoded `causes`/`countries`/`partners` | Firestore-backed catalog of real gift items |
 | `amounts = [20, 50, 100, 250]` | Real item prices from the catalog |
 | Tracking screen with canned copy | Real order status from Firestore, live-updating |
-| Video player with a progress bar | Real facilitator-uploaded delivery photo |
+| Video player with a progress bar | Real relay-uploaded delivery photo |
 | "AI Verified" badge with nothing behind it | A real server-side vision check |
 | No auth, name/email typed into a form | Firebase Auth accounts |
 | `donorId` from a local generator | Server-issued order IDs |
@@ -129,7 +129,7 @@ structure** so the single-file rule no longer contradicts the codebase.
 
 ## 4. Data model (Firestore)
 
-This schema is the contract with the GR8 app and admin console. Design it for
+This schema is the contract with the relay app and admin console. Design it for
 all three surfaces now, even though only the donor surface is built.
 
 ### `users/{uid}`
@@ -146,7 +146,7 @@ notificationPrefs: { email: bool }
 itemId, name, description,
 category ("water"|"education"|"health"|"food"),
 priceUsdCents (number),          # what the gift itself costs
-facilitatorFeeUsdCents (number), # what the GR8 earns delivering it
+relayFeeUsdCents (number), # what the relay earns delivering it
 platformFeeUsdCents (number),    # Amelior8's cut
 countryCode, partnerId,
 imageUrl,
@@ -179,7 +179,7 @@ partnerId, partnerSnapshot: {...},
 countryCode,
 
 # money, all USD cents
-giftAmount, facilitatorFee, platformFee, totalCharged,
+giftAmount, relayFee, platformFee, totalCharged,
 currency: "USD",
 
 # payment
@@ -190,9 +190,9 @@ subscriptionId|null,              # set if this order came from recurring giving
 # fulfilment
 status,                           # see §5
 stageTimestamps: { funded, assigned, purchased, delivered },
-facilitatorId|null,
-facilitatorSnapshot: { name, photoUrl, rating }|null,
-recipientRef|null,                # opaque handle, set by partner/GR8 side
+relayId|null,
+relaySnapshot: { name, photoUrl, rating }|null,
+recipientRef|null,                # opaque handle, set by partner/relay side
 estimatedDeliveryAt|null,
 
 # proof
@@ -207,7 +207,7 @@ verification: {
 },
 
 # ledger — reserved for the payout system, written but not acted on
-facilitatorEarning: { amountUsdCents, status: "accrued"|"payable"|"paid", payoutId|null },
+relayEarning: { amountUsdCents, status: "accrued"|"payable"|"paid", payoutId|null },
 
 createdAt, updatedAt, cancelledAt|null
 ```
@@ -215,12 +215,12 @@ createdAt, updatedAt, cancelledAt|null
 ### `orders/{orderId}/events/{eventId}` — immutable audit trail
 ```
 type, fromStatus, toStatus,
-actor: { kind: "system"|"ops"|"facilitator"|"donor", id },
+actor: { kind: "system"|"ops"|"relay"|"donor", id },
 metadata, createdAt
 ```
 
 Every status change appends an event. No exceptions. This is what makes
-disputes, refunds, and facilitator pay arguments resolvable later.
+disputes, refunds, and relay pay arguments resolvable later.
 
 ### `subscriptions/{subscriptionId}` — recurring giving
 ```
@@ -230,12 +230,12 @@ status: "active"|"paused"|"cancelled",
 nextChargeAt, createdOrderIds: [], createdAt, cancelledAt|null
 ```
 
-### `facilitators/{facilitatorId}` — reserved
-Minimal now: `facilitatorId, name, photoUrl, countryCode, active, rating,
-completedDeliveries`. Seeded manually; the GR8 app owns this later.
+### `relays/{relayId}` — reserved
+Minimal now: `relayId, name, photoUrl, countryCode, active, rating,
+completedDeliveries`. Seeded manually; the relay app owns this later.
 
 ### `payouts/{payoutId}` — reserved
-`payoutId, facilitatorId, orderIds: [], amountUsdCents, status: "draft",
+`payoutId, relayId, orderIds: [], amountUsdCents, status: "draft",
 createdAt`. Records accrue; nothing sends money.
 
 ### `webhookEvents/{stripeEventId}`
@@ -265,7 +265,7 @@ Donor-visible stage mapping:
 | Stage | Label | Statuses |
 |---|---|---|
 | 1 | Money received | `FUNDED` and later |
-| 2 | GR8 chosen | `ASSIGNED` and later |
+| 2 | relay chosen | `ASSIGNED` and later |
 | 3 | Gift bought | `PURCHASED` and later |
 | 4 | Gift delivered | `DELIVERED`, `VERIFIED` |
 
@@ -280,7 +280,7 @@ Rules, enforced server-side in one shared module:
   success, not an error.
 - **Attributed.** Every transition records actor and timestamp.
 - **Single implementation.** One `transitionOrder()` function. The ops endpoints
-  and, later, the GR8 app both call it. No status field is ever written
+  and, later, the relay app both call it. No status field is ever written
   directly.
 
 ---
@@ -351,7 +351,7 @@ their profile.
 `customer.subscription.deleted`.
 
 **Money handling:** all amounts are integer USD cents everywhere. No floats. No
-client-supplied prices. Charge total = `giftAmount + facilitatorFee +
+client-supplied prices. Charge total = `giftAmount + relayFee +
 platformFee`, and the breakdown is shown to the donor before they pay.
 
 ### Charity of record
@@ -370,7 +370,7 @@ Partner NGOs are the charity of record, not Amelior8. Therefore:
 Photo only for this build. Video is a later phase — but store proof as a
 collection-shaped field so adding video is additive, not a migration.
 
-**Upload path** (used by the GR8 app later, exercised by ops now):
+**Upload path** (used by the relay app later, exercised by ops now):
 1. `POST /api/orders/[id]/proof-upload-url` returns a short-lived signed
    Firebase Storage upload URL
 2. Uploader PUTs the photo
@@ -411,7 +411,7 @@ Milestone timeline with ETA. No live GPS.
 - Real-time via a Firestore `onSnapshot` listener on the order — the screen
   updates without a refresh
 - Four stages with completed/current/pending states and real timestamps
-- Facilitator first name and photo once `ASSIGNED`
+- Relay first name and photo once `ASSIGNED`
 - Estimated delivery window from `estimatedDeliveryAt`, computed at assignment
   from the item's `estimatedDeliveryDays`
 - Delivery photo and verification badge in stage 4
@@ -431,7 +431,7 @@ Transactional email via Resend. Plain, brand-consistent, no emoji.
 | Trigger | Email |
 |---|---|
 | `FUNDED` | Gift confirmation + amount breakdown + partner named + tracking link |
-| `ASSIGNED` | A GR8 has been assigned, with estimated delivery |
+| `ASSIGNED` | A relay has been assigned, with estimated delivery |
 | `PURCHASED` | Gift purchased |
 | `VERIFIED` | Delivered — with the proof photo and tracking link |
 | `PROOF_REJECTED` | Honest status update, no blame, what happens next |
@@ -443,17 +443,17 @@ type so a webhook retry can't double-send.
 
 ---
 
-## 12. Ops endpoints (stand-in for the GR8 app)
+## 12. Ops endpoints (stand-in for the relay app)
 
-These are how orders actually move until the facilitator app exists. Protect
+These are how orders actually move until the relay app exists. Protect
 them with a bearer `OPS_API_KEY` **and** a Firebase custom claim `role: "ops"`.
 Never expose them to the donor client.
 
-- `POST /api/ops/orders/[id]/assign` — body `{ facilitatorId }` → `ASSIGNED`
+- `POST /api/ops/orders/[id]/assign` — body `{ relayId }` → `ASSIGNED`
 - `POST /api/ops/orders/[id]/advance` — body `{ toStatus, note }` → validated
   transition
 - `POST /api/ops/orders/[id]/proof-upload-url` — get an upload URL on a
-  facilitator's behalf
+  relay's behalf
 - `POST /api/ops/proofs/[id]/review` — approve/reject
 - `GET /api/ops/orders?status=` — queue view
 
@@ -474,7 +474,7 @@ Firestore rules, deny by default:
 - `users/{uid}` — read/write own document only, and only the profile fields
 - `orders` — read only where `donorUid == request.auth.uid`; **no client writes,
   ever**
-- `orders/*/events`, `payouts`, `facilitators`, `webhookEvents`,
+- `orders/*/events`, `payouts`, `relays`, `webhookEvents`,
   `subscriptions` — no client access; server-only
 - Storage: proof photos are not publicly readable; access is via signed URLs only
 
@@ -518,7 +518,7 @@ and Stripe test mode:
 5. Replaying the same webhook event creates no duplicate order or email
 6. The donor receives a confirmation email naming the partner NGO
 7. The tracking screen shows stage 1 complete, live, without a refresh
-8. Ops assigns a facilitator; the donor's open tracking screen advances to
+8. Ops assigns a relay; the donor's open tracking screen advances to
    stage 2 on its own
 9. Ops advances to `PURCHASED`; stage 3 updates; email sends
 10. A proof photo is uploaded; AI verification runs; a matching photo passes and
@@ -565,6 +565,6 @@ These do not block the build. They block the switch to live keys.
 - Firebase project confirmed on a paid plan with Storage and the sign-in
   providers enabled, plus a service account key
 - An Anthropic API key for verification
-- A vetted facilitator roster to seed `facilitators`
+- A vetted relay roster to seed `relays`
 - The decision on which country launches first, and the payout rail that follows
   from it

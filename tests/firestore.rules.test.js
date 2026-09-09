@@ -50,7 +50,7 @@ beforeEach(async () => {
     });
     await setDoc(doc(db, "users/alice"), { uid: "alice", totalGiven: 4300, giftCount: 1 });
     await setDoc(doc(db, "subscriptions/sub_1"), { donorUid: "alice", status: "active" });
-    await setDoc(doc(db, "facilitators/gr8_1"), { name: "James M.", active: true });
+    await setDoc(doc(db, "relays/relay_1"), { name: "James M.", active: true });
   });
 });
 
@@ -127,8 +127,8 @@ describe("server-only collections", () => {
     await assertFails(getDoc(doc(asAlice(), "subscriptions/sub_1")));
   });
 
-  it("hides facilitators from the client", async () => {
-    await assertFails(getDoc(doc(asAlice(), "facilitators/gr8_1")));
+  it("hides relays from the client", async () => {
+    await assertFails(getDoc(doc(asAlice(), "relays/relay_1")));
   });
 
   it("hides webhook bookkeeping from the client", async () => {

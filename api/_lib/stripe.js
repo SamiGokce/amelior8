@@ -19,13 +19,13 @@ export const isLiveMode = () => (process.env.STRIPE_SECRET_KEY || "").startsWith
 export function priceBreakdown(item, quantity = 1) {
   const q = Math.max(1, Math.min(10, Math.floor(quantity) || 1));
   const giftAmount = item.priceUsdCents * q;
-  const facilitatorFee = item.facilitatorFeeUsdCents * q;
+  const relayFee = item.relayFeeUsdCents * q;
   const platformFee = item.platformFeeUsdCents * q;
   return {
     quantity: q,
     giftAmount,
-    facilitatorFee,
+    relayFee,
     platformFee,
-    totalCharged: giftAmount + facilitatorFee + platformFee,
+    totalCharged: giftAmount + relayFee + platformFee,
   };
 }

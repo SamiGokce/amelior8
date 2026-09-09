@@ -69,7 +69,7 @@ describe("donor-visible stages", () => {
     expect(stageStates({ status: STATUS.VERIFIED })).toHaveLength(4);
   });
 
-  it("marks stage one current while awaiting a GR8", () => {
+  it("marks stage one current while awaiting a relay", () => {
     const stages = stageStates({ status: STATUS.FUNDED });
     expect(stages[0].state).toBe("complete");
     expect(stages[1].state).toBe("current");

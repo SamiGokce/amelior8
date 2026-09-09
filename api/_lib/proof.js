@@ -10,7 +10,7 @@ const READ_WINDOW_MS = 15 * 60 * 1000;
 /**
  * Issues a short-lived signed upload URL for an order's delivery photo.
  *
- * Shared by the facilitator-facing route and the ops stand-in so both write
+ * Shared by the relay-facing route and the ops stand-in so both write
  * the photo to exactly the same place under the same rules.
  */
 export async function createProofUploadUrl(orderId, contentType, actor) {
@@ -69,7 +69,7 @@ export async function completeProof(orderId, path, actor, { recipientMessage = n
 
   const patch = {
     proofPhotoPath: path,
-    // Optional, captured by the facilitator at handover. The donor's tracking
+    // Optional, captured by the relay at handover. The donor's tracking
     // page renders the quote block only when this is actually present — never
     // a stand-in.
     ...(recipientMessage ? { recipientMessage: String(recipientMessage).slice(0, 500) } : {}),

@@ -68,7 +68,7 @@ export default function Home() {
                     lines={[countryName(item.countryCode)]}
                     right={
                       <span style={{ fontSize: "13px", fontWeight: 700, color: colors.text, fontFamily: fonts.ui }}>
-                        {formatUsd(item.priceUsdCents + item.facilitatorFeeUsdCents + item.platformFeeUsdCents)}
+                        {formatUsd(item.priceUsdCents + item.relayFeeUsdCents + item.platformFeeUsdCents)}
                       </span>
                     }
                     onClick={() => navigate(`/gift/${item.id}`)}
@@ -158,7 +158,7 @@ export default function Home() {
                 color: colors.text, margin: "0 0 6px", letterSpacing: "-0.03em",
               }}>Give something real</h2>
               <p style={{ fontSize: "12.5px", color: colors.textSecondary, margin: 0, lineHeight: 1.5, fontFamily: fonts.body }}>
-                Pick a specific gift. A vetted local facilitator buys it, delivers it
+                Pick a specific gift. A vetted local relay buys it, delivers it
                 in person, and sends you a photo of the handover.
               </p>
             </div>

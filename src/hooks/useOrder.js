@@ -6,7 +6,7 @@ import { useAuth } from "./useAuth";
 
 /**
  * Live subscription to one order. This is what makes the tracking screen
- * advance on its own when ops (or later the GR8 app) moves a stage — no
+ * advance on its own when ops (or later the relay app) moves a stage — no
  * polling, no refresh.
  */
 export function useOrder(orderId) {

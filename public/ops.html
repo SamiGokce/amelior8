@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Amelior8 Ops</title>
 <!--
-  Internal ops console. Stands in for the GR8 facilitator app until it exists.
+  Internal ops console. Stands in for the relay relay app until it exists.
 
   Deliberately unstyled — this is not a product surface and gets no design
-  effort. It calls exactly the same /api/ops endpoints the GR8 app will call,
+  effort. It calls exactly the same /api/ops endpoints the relay app will call,
   so nothing on the donor side changes when that app arrives.
 
   Access needs BOTH a Firebase account with the `role: "ops"` custom claim and
@@ -43,7 +43,7 @@
   <div class="bar">
     <select id="filter" onchange="load()">
       <option value="">All orders</option>
-      <option value="FUNDED">FUNDED — needs a GR8</option>
+      <option value="FUNDED">FUNDED — needs a relay</option>
       <option value="ASSIGNED">ASSIGNED — awaiting purchase</option>
       <option value="PURCHASED">PURCHASED — awaiting delivery</option>
       <option value="DELIVERED">DELIVERED — check verification</option>
@@ -135,10 +135,10 @@ function render(orders) {
       <td>${o.id}</td>
       <td>${o.status}</td>
       <td>${o.item || ""}<br><small>${o.partner || ""} · ${o.country || ""}</small></td>
-      <td>${o.facilitator || "--"}</td>
+      <td>${o.relay || "--"}</td>
       <td>${o.verification}</td>
       <td>
-        ${o.status === "FUNDED" ? `<button onclick="assign('${o.id}')">Assign GR8</button>` : ""}
+        ${o.status === "FUNDED" ? `<button onclick="assign('${o.id}')">Assign relay</button>` : ""}
         ${o.status === "ASSIGNED" ? `<button onclick="advance('${o.id}','PURCHASED')">Mark bought</button>` : ""}
         ${o.status === "PURCHASED" || o.status === "PROOF_REJECTED" ? `<button onclick="uploadProof('${o.id}')">Upload proof</button>` : ""}
         ${o.status === "DELIVERED" ? `<button onclick="review('${o.id}','approve')">Approve</button><button onclick="review('${o.id}','reject')">Reject</button>` : ""}
@@ -148,15 +148,15 @@ function render(orders) {
     </tr>`).join("");
 
   document.getElementById("table").innerHTML = `
-    <tr><th>Order</th><th>Status</th><th>Gift</th><th>GR8</th><th>Proof</th><th>Actions</th></tr>
+    <tr><th>Order</th><th>Status</th><th>Gift</th><th>relay</th><th>Proof</th><th>Actions</th></tr>
     ${rows || "<tr><td colspan=6>No orders.</td></tr>"}`;
 }
 
 window.assign = async (id) => {
-  const facilitatorId = prompt("Facilitator id (document id in the facilitators collection):");
-  if (!facilitatorId) return;
+  const relayId = prompt("Relay id (document id in the relays collection):");
+  if (!relayId) return;
   try {
-    show(await call(`/ops/orders/${id}/assign`, { method: "POST", body: { facilitatorId } }));
+    show(await call(`/ops/orders/${id}/assign`, { method: "POST", body: { relayId } }));
     load();
   } catch (err) { show("Assign failed: " + err.message); }
 };
