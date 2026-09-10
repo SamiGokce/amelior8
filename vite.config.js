@@ -7,6 +7,14 @@ import { resolve } from 'path'
 // downloads the donor app.
 export default defineConfig({
   plugins: [react()],
+  // Only affects `vite dev`; irrelevant to the production build. Lets the
+  // frontend's same-origin `/api/...` calls reach scripts/dev-api.mjs when
+  // it's running locally — see that file for why it exists.
+  server: {
+    proxy: {
+      "/api": "http://127.0.0.1:5100",
+    },
+  },
   build: {
     rollupOptions: {
       input: {

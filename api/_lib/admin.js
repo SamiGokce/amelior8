@@ -5,6 +5,7 @@ import { cert, getApp, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
+import { localBucket } from "./localStorage.js";
 
 function credentials() {
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
@@ -35,5 +36,16 @@ export function adminApp() {
 
 export const adminDb = () => getFirestore(adminApp());
 export const adminAuth = () => getAuth(adminApp());
-export const adminBucket = () => getStorage(adminApp()).bucket();
+
+/**
+ * Local-disk stand-in for Firebase Storage, used only when LOCAL_STORAGE_DIR
+ * is set — which is never the case on Vercel. Firebase's own Storage emulator
+ * doesn't support the V4 signed-URL scheme proof.js relies on (write actions
+ * 501), and real Storage needs the Blaze plan. This lets the relay
+ * purchase/deliver flow be tested end-to-end against a fully local stack
+ * (see scripts/dev-api.mjs) before that billing decision is made.
+ */
+export const adminBucket = () =>
+  process.env.LOCAL_STORAGE_DIR ? localBucket() : getStorage(adminApp()).bucket();
+
 export { FieldValue };
