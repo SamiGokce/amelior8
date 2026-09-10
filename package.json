@@ -14,8 +14,8 @@
     "test": "vitest run",
     "test:rules": "firebase emulators:exec --only firestore \"vitest run --config vitest.rules.config.js\"",
     "seed": "node scripts/seed-catalog.mjs",
-    "emulator": "firebase emulators:start --only firestore,auth --project amelior8it",
-    "seed:emulator": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 GCLOUD_PROJECT=amelior8it node scripts/seed-catalog.mjs --force",
+    "emulator": "firebase emulators:start --only firestore,auth --project amelior8-3dfef",
+    "seed:emulator": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 GCLOUD_PROJECT=amelior8-3dfef node scripts/seed-catalog.mjs --force",
     "dev:emulator": "VITE_USE_EMULATOR=1 vite"
   },
   "dependencies": {

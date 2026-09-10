@@ -28,7 +28,7 @@ export function adminApp() {
     ? getApp()
     : initializeApp({
         credential: credentials(),
-        storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "amelior8it.firebasestorage.app",
+        storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "amelior8-3dfef.firebasestorage.app",
       });
   return cached;
 }

@@ -10,12 +10,12 @@ import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 import { connectAuthEmulator } from "firebase/auth";
 
 const config = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyB8r_o3Vgxnu6ClOZ52RVoTnP7OyVAL37s",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "amelior8it.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "amelior8it",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "amelior8it.firebasestorage.app",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyB_dkil69qCnrs5bHXNo4_cnk6_LzjePWk",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "amelior8-3dfef.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "amelior8-3dfef",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "amelior8-3dfef.firebasestorage.app",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:514297256936:web:db93d725d48de21f1c625d",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "514297256936",
 };
 
 export const app = getApps().length ? getApp() : initializeApp(config);
