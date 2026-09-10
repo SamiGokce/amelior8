@@ -33,15 +33,27 @@ export function OrgAuthProvider({ children }) {
   const [profile, setProfile] = useState(null);   // { user, org } from /api/org/me
   const [loading, setLoading] = useState(true);
   const [noRole, setNoRole] = useState(false);
+  // Anything that isn't the expected "no role yet" 403 — a real failure the
+  // person needs to see, not silently swallowed back into a blank sign-in form.
+  const [profileError, setProfileError] = useState(null);
 
   const loadProfile = useCallback(async () => {
     try {
       setProfile(await orgApi.me());
       setNoRole(false);
+      setProfileError(null);
     } catch (err) {
       setProfile(null);
-      // 403 here means authenticated but not a member of any organisation.
-      setNoRole(err?.status === 403);
+      // 403 here means authenticated but not a member of any organisation —
+      // that has its own dedicated screen, so it is not an "error".
+      const isNoRole = err?.status === 403;
+      setNoRole(isNoRole);
+      if (!isNoRole) {
+        console.error("Could not load org profile:", err);
+        setProfileError(err?.message || "Could not load your account. Try again.");
+      } else {
+        setProfileError(null);
+      }
     }
   }, []);
 
@@ -65,6 +77,7 @@ export function OrgAuthProvider({ children }) {
     isAdmin: !!profile?.user?.isAdmin,
     loading,
     noRole,
+    profileError,
     emailVerified: !!user?.emailVerified,
 
     signIn: (email, password) => signInWithEmailAndPassword(auth, email, password),
@@ -96,7 +109,7 @@ export function OrgAuthProvider({ children }) {
     },
 
     signOut: () => signOut(auth),
-  }), [user, profile, loading, noRole, loadProfile]);
+  }), [user, profile, loading, noRole, profileError, loadProfile]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

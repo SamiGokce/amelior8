@@ -10,7 +10,7 @@ import { Banner, Button, Card, Field, H1, Muted } from "../components";
  */
 export default function Auth({ inviteToken }) {
   const {
-    user, loading, noRole, emailVerified,
+    user, loading, noRole, profileError, emailVerified,
     signIn, signUp, resetPassword, resendVerification, refresh, redeemInvite, signOut,
   } = useOrgAuth();
 
@@ -94,6 +94,25 @@ export default function Auth({ inviteToken }) {
         </Button>
       </div>
       <Button variant="quiet" onClick={signOut} style={{ padding: "12px 0", marginTop: "8px" }}>Sign out</Button>
+    </>);
+  }
+
+  // Signed in and verified, but the server call to check who they are failed
+  // outright — not the expected "no organisation" case. This used to be
+  // silently swallowed, leaving someone looking at a blank sign-in form with
+  // no idea anything had gone wrong. Now it says so.
+  if (user && profileError && !noRole) {
+    return shell(<>
+      <H1 style={{ fontSize: "20px" }}>Something went wrong</H1>
+      <Banner tone="error">{profileError}</Banner>
+      <Muted style={{ marginBottom: "18px" }}>
+        You're signed in as <strong>{user.email}</strong>, but we couldn't load
+        your account. This is usually temporary — try again in a moment.
+      </Muted>
+      <div style={{ display: "flex", gap: "8px" }}>
+        <Button onClick={refresh}>Try again</Button>
+        <Button variant="quiet" onClick={signOut}>Sign out</Button>
+      </div>
     </>);
   }
 
