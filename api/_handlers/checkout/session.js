@@ -166,6 +166,10 @@ export default withErrors(async (req, res) => {
   // rather than hardcoded — a cent of rounding either way on renewals.
   const applicationFeePercent = Number(((price.platformFee / price.totalCharged) * 100).toFixed(4));
 
+  // Keyed on the order already committed to Firestore, so a retried call to
+  // Stripe (the SDK's own network-error retries, or a re-invoked function)
+  // reuses the same Checkout Session instead of minting a second one for an
+  // order that already exists.
   const session = await stripe().checkout.sessions.create({
     mode,
     line_items: lineItems,
@@ -190,7 +194,7 @@ export default withErrors(async (req, res) => {
         }),
     success_url: `${base}/checkout/success?order=${orderId}&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${base}/gift/${itemId}?cancelled=1`,
-  });
+  }, { idempotencyKey: `checkout_${orderId}` });
 
   await db.collection("orders").doc(orderId).update({
     stripeCheckoutSessionId: session.id,

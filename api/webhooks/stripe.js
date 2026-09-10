@@ -209,6 +209,42 @@ async function onSubscriptionDeleted(subscription) {
   }, { merge: true });
 }
 
+/**
+ * A recurring gift's renewal charge failed (card expired, insufficient
+ * funds). Stripe will retry on its own schedule; this just makes the
+ * subscription's real state visible instead of it silently stalling.
+ */
+async function onInvoicePaymentFailed(invoice) {
+  if (!invoice.subscription) return;
+  await adminDb().collection("subscriptions").doc(invoice.subscription).set({
+    status: "payment_failed",
+    lastPaymentFailedAt: FieldValue.serverTimestamp(),
+  }, { merge: true });
+  console.error(`Recurring gift renewal failed for subscription ${invoice.subscription}`);
+}
+
+/**
+ * The transfer half of a destination charge failed to reach the partner —
+ * the donor was charged but the money never arrived. This can only happen
+ * after the charge itself succeeded, so there is no order transition that
+ * is safe to make automatically; it needs a human to look at it, same as
+ * any other dispute. Logged loudly so it surfaces instead of vanishing.
+ */
+async function onTransferFailed(transfer) {
+  console.error(
+    `Transfer ${transfer.id} to account ${transfer.destination} failed — ` +
+    `charge ${transfer.source_transaction || "unknown"}. Needs manual review.`,
+  );
+}
+
+/** A partner's payout to their own bank failed on Stripe's side. */
+async function onPayoutFailed(payout, account) {
+  console.error(
+    `Payout ${payout.id} failed for connected account ${account} — ` +
+    `${payout.failure_message || payout.failure_code || "no reason given"}.`,
+  );
+}
+
 export default withErrors(async (req, res) => {
   if (!methodGuard(req, res, "POST")) return;
 
@@ -248,10 +284,14 @@ export default withErrors(async (req, res) => {
     switch (event.type) {
       case "checkout.session.completed": await onCheckoutCompleted(event.data.object); break;
       case "invoice.paid": await onInvoicePaid(event.data.object); break;
+      case "invoice.payment_failed": await onInvoicePaymentFailed(event.data.object); break;
       case "payment_intent.payment_failed": await onPaymentFailed(event.data.object); break;
       case "charge.refunded": await onChargeRefunded(event.data.object); break;
       case "customer.subscription.deleted": await onSubscriptionDeleted(event.data.object); break;
       case "account.updated": await onAccountUpdated(event.data.object); break;
+      case "transfer.failed": await onTransferFailed(event.data.object); break;
+      // Connect events carry the connected account id on the event itself.
+      case "payout.failed": await onPayoutFailed(event.data.object, event.account); break;
       default: console.log(`Unhandled Stripe event ${event.type}`);
     }
   } catch (err) {

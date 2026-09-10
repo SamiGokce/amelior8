@@ -9,3 +9,9 @@ screenshots
 firebase-debug.log
 *-debug.log
 amelior8-test-access.txt
+
+# Local Claude Code tooling — machine-specific, not app code
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.agents/
+skills-lock.json
