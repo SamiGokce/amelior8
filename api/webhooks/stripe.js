@@ -223,20 +223,6 @@ async function onInvoicePaymentFailed(invoice) {
   console.error(`Recurring gift renewal failed for subscription ${invoice.subscription}`);
 }
 
-/**
- * The transfer half of a destination charge failed to reach the partner —
- * the donor was charged but the money never arrived. This can only happen
- * after the charge itself succeeded, so there is no order transition that
- * is safe to make automatically; it needs a human to look at it, same as
- * any other dispute. Logged loudly so it surfaces instead of vanishing.
- */
-async function onTransferFailed(transfer) {
-  console.error(
-    `Transfer ${transfer.id} to account ${transfer.destination} failed — ` +
-    `charge ${transfer.source_transaction || "unknown"}. Needs manual review.`,
-  );
-}
-
 /** A partner's payout to their own bank failed on Stripe's side. */
 async function onPayoutFailed(payout, account) {
   console.error(
@@ -289,7 +275,6 @@ export default withErrors(async (req, res) => {
       case "charge.refunded": await onChargeRefunded(event.data.object); break;
       case "customer.subscription.deleted": await onSubscriptionDeleted(event.data.object); break;
       case "account.updated": await onAccountUpdated(event.data.object); break;
-      case "transfer.failed": await onTransferFailed(event.data.object); break;
       // Connect events carry the connected account id on the event itself.
       case "payout.failed": await onPayoutFailed(event.data.object, event.account); break;
       default: console.log(`Unhandled Stripe event ${event.type}`);
