@@ -11,7 +11,7 @@ import orderAssign from "../_handlers/org/orders/[id]/assign.js";
 import orderReview from "../_handlers/org/orders/[id]/review.js";
 
 // One Serverless Function for every /api/org/* route. See _handlers/_router.js.
-export default router([
+export default router("/api/org", [
   { pattern: "/me", handler: me },
   { pattern: "/invites", handler: invites },
   { pattern: "/stripe", handler: stripeStatus },

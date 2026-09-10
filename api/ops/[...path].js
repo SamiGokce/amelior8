@@ -9,7 +9,7 @@ import orderProofUpload from "../_handlers/ops/orders/[id]/proof-upload-url.js";
 import proofReview from "../_handlers/ops/proofs/[id]/review.js";
 
 // One Serverless Function for every /api/ops/* route. See _handlers/_router.js.
-export default router([
+export default router("/api/ops", [
   { pattern: "/orgs", handler: orgs },
   { pattern: "/payouts", handler: payouts },
   { pattern: "/orders", handler: ordersIndex },

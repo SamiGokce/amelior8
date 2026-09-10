@@ -11,7 +11,7 @@ import proofUrl from "./_handlers/orders/[id]/proof-url.js";
 // checkout, subscriptions, invites, and the donor's own proof endpoints.
 // /api/org/*, /api/relay/*, /api/ops/* and /api/webhooks/* each have their
 // own file and take precedence over this catch-all for those prefixes.
-export default router([
+export default router("/api", [
   { pattern: "/checkout/session", handler: checkoutSession },
   { pattern: "/subscriptions", handler: subscriptionsIndex },
   { pattern: "/subscriptions/cancel", handler: subscriptionsCancel },
